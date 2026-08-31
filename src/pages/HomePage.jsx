@@ -59,9 +59,6 @@ export default function HomePage() {
         </section>
       )}
 
-
-   
-
       {/* Kategorilere Göre Listeleme */}
       <div className="general2">
         {categories.map((cat) => {
