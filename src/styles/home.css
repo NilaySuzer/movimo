@@ -1,0 +1,231 @@
+.general1 {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.general1 h1 {
+  font-family: "Bebas Neue", cursive;
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  color: #f5c518;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.search-box {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 25px;
+  border: 1px solid #444;
+  outline: none;
+  background-color: #1e1e1e;
+  color: white;
+  width: 320px;
+  transition: border-color 0.3s ease;
+}
+
+.search-box:focus {
+  border-color: #f5c518;
+}
+
+.search-btn {
+  padding: 12px 25px;
+  background-color: #f5c518;
+  border: none;
+  border-radius: 25px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.3s ease;
+}
+
+.search-btn:hover {
+  background-color: #e5b510;
+  transform: scale(1.05);
+}
+
+.movies--grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.movie--card {
+  position: relative;
+  width: 220px;
+  height: 330px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  background-color: #1a1a1a;
+  transition: transform 0.3s ease;
+}
+
+.movie--card:hover {
+  transform: translateY(-8px);
+}
+
+.movie--card .ribbon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+}
+
+.movie--card .ribbon img {
+  width: 30px;
+  height: 30px;
+}
+
+.movie--poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie--info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  display: flex;
+  justify-content: center;
+}
+
+.movie--info button {
+  background: #f5c518;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.movie--info button:hover {
+  background: #b20710;
+  color: white;
+}
+
+/* Category Navigation Buttons */
+.buttons {
+  margin: 40px 0;
+}
+
+.button-container h2 {
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+}
+
+.category-nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.category-nav button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background: #222;
+  color: #fff;
+  transition: 0.3s ease;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+}
+
+.category-nav button:hover {
+  background: #f5c518;
+  color: #000;
+  transform: scale(1.05);
+}
+
+/* Category Movies Grids */
+.category-section {
+  margin: 60px auto;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+
+.category-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: left;
+  border-left: 5px solid #f5c518;
+  padding-left: 10px;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card {
+  background: #181818;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+.card img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.card-content button {
+  background: #f5c518;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s ease;
+}
+
+.card-content button:hover {
+  background: #b20710;
+  color: white;
+}
