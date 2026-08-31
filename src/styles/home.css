@@ -5,10 +5,10 @@
 
 .general1 h1 {
   font-family: "Bebas Neue", cursive;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   letter-spacing: 2px;
   margin-bottom: 25px;
-  color: #f5c518;
+  color: #fff;
 }
 
 .search-form {
@@ -19,15 +19,11 @@
 }
 
 .search-box {
-  padding: 12px 20px;
-  font-size: 1rem;
-  border-radius: 25px;
-  border: 1px solid #444;
-  outline: none;
-  background-color: #1e1e1e;
-  color: white;
-  width: 320px;
-  transition: border-color 0.3s ease;
+  margin-top: -5px;
+  padding: 8px;
+  border: 2px solid #ccc;
+  border-radius: 20px;
+  width: 300px;
 }
 
 .search-box:focus {
@@ -55,7 +51,7 @@
 .movies--grid {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 80px;
   flex-wrap: wrap;
   margin-bottom: 40px;
 }
@@ -63,11 +59,17 @@
 .movie--card {
   position: relative;
   width: 220px;
-  height: 330px;
+  height: 480px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-  background-color: #1a1a1a;
+  background-color: #1818188d;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.716);
+  border-radius: 8px;
+  overflow: hidden;
+
   transition: transform 0.3s ease;
 }
 
@@ -104,13 +106,19 @@
 }
 
 .movie--info button {
-  background: #f5c518;
+  padding: 10px 5px;
   border: none;
-  padding: 8px 16px;
   border-radius: 20px;
-  font-weight: bold;
+  background: rgb(0, 0, 0);
+  color: white;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-fi0lter: blur(10px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.716);
+  border: 1px solid rgba(255, 255, 255, 0.092);
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: 0.3s;
+  font-size: 17px;
+  width: 190px;
 }
 
 .movie--info button:hover {
@@ -172,7 +180,7 @@
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 25px;
+  gap: 40px;
 }
 
 .card-link {
@@ -181,6 +189,8 @@
 }
 
 .card {
+  width: 500;
+  height: 400;
   background: #181818;
   border-radius: 10px;
   overflow: hidden;
@@ -215,14 +225,18 @@
 }
 
 .card-content button {
-  background: #f5c518;
+  padding: 8px 4px;
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: 20px;
+  background: #f5c518;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-fi0lter: blur(10px);
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.716);
+  border: 1px solid rgba(255, 255, 255, 0.092);
+  transition: all 0.3s ease;
   cursor: pointer;
-  width: 100%;
-  transition: 0.3s ease;
+  font-size: 17px;
+  width: 190px;
 }
 
 .card-content button:hover {

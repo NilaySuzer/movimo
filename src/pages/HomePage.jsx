@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { movies, comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
@@ -22,7 +22,7 @@ export default function HomePage() {
 
   return (
     <div className="general1">
-      <h1>🍿Welcome! Looking for a movie to watch?🍿</h1>
+      <h1>Welcome! Looking for a movie to watch?</h1>
 
       <form className="search-form" onSubmit={handleSearch}>
         <input
@@ -59,36 +59,8 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Coming Soon Grid */}
-      <div className="movies--grid">
-        {comingSoonMovies.map((movie) => (
-          <div className="movie--card" key={movie.id}>
-            <div className="ribbon" title="Coming Soon">
-              <img src="/imgs/clapperboard.png" alt="Video Camera Icon" />
-            </div>
-            <img className="movie--poster" src={movie.poster} alt="Poster" />
-            <div className="movie--info">
-              <a href={movie.trailerUrl} target="_blank" rel="noreferrer">
-                <button>Watch trailer</button>
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Kategori Butonları */}
-      <section className="buttons">
-        <div className="button-container">
-          <h2>Categories🔻</h2>
-          <div className="category-nav">
-            {categories.map((cat) => (
-              <a key={cat.id} href={`#${cat.id}`}>
-                <button>{cat.label}</button>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+   
 
       {/* Kategorilere Göre Listeleme */}
       <div className="general2">
