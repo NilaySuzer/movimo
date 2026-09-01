@@ -99,43 +99,7 @@ export default function HomePage() {
       </div>
 
       <div className="general1">
-        {/* 2. SEARCH BAR */}
-        <h1> Looking for a movie to watch?🍿</h1>
-        <form className="search-form" onSubmit={handleSearch}>
-          <input
-            className="search-box"
-            type="search"
-            placeholder="Search movie..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button className="search-btn" type="submit">Search</button>
-        </form>
-
-        {/* SEARCH RESULTS */}
-        {searchTerm.trim() && (
-          <section id="search-results" className="category-section">
-            <h2 className="category-title a">Search Results for "{searchTerm}"</h2>
-            <div className="card-container">
-              {filteredMovies.length > 0 ? (
-                filteredMovies.map((movie) => (
-                  <div key={movie.slug} className="card">
-                    <img src={movie.poster} alt={movie.title} />
-                    <div className="card-content">
-                      <div className="card-title">{movie.title}</div>
-                      <Link to={`/movie/${movie.slug}`} style={{ width: '100%' }}>
-                        <button style={{ backgroundColor: '#f5c518' }}>Review</button>
-                      </Link>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p style={{ color: '#ccc' }}>No movies found matching your query.</p>
-              )}
-            </div>
-          </section>
-        )}
-
+      
         {/* 3. TRENDING NOW SECTION (HORIZONTAL CAROUSEL) */}
         <section className="category-section">
           <div className="section-header-box">
