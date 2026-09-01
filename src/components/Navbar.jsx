@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,  useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
@@ -8,7 +8,30 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [accountDropdown, setAccountDropdown] = useState(false);
+  // Arama State'leri
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef(null);
 
+  // Dışarı tıklayınca arama panelini kapat
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Canlı arama filtresi
+  const filteredMovies = searchTerm.trim()
+    ? movies.filter((m) =>
+        m.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
+  
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -41,9 +64,58 @@ export default function Navbar() {
         <Link to="/" className="nav-logo" onClick={closeAll}>
                   <span className="logo-icon">MMM</span>
                   <span className="logo-text"> Movimo<span className="accent-dot">.</span>com </span>
-                  
-          
         </Link>
+
+          {/* 🔍 NAVBAR ARAMA ÇUBUĞU & CANLI SONUÇLAR */}
+        <div className="nav-search-wrapper" ref={searchRef}>
+          <form 
+            className="nav-search-form" 
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <span className="nav-search-icon">🔍</span>
+            <input
+              className="nav-search-input"
+              type="search"
+              placeholder="Search movie..."
+              value={searchTerm}
+              onFocus={() => setIsSearchOpen(true)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setIsSearchOpen(true);
+              }}
+            />
+          </form>
+
+          {/* Canlı Arama Sonuç Paneli */}
+          {isSearchOpen && searchTerm.trim() && (
+            <div className="search-results-dropdown glass-panel">
+              {filteredMovies.length > 0 ? (
+                filteredMovies.map((movie) => (
+                  <Link
+                    key={movie.slug}
+                    to={`/movie/${movie.slug}`}
+                    className="search-result-item"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setIsSearchOpen(false);
+                    }}
+                  >
+                    <img src={movie.poster} alt={movie.title} className="search-result-img" />
+                    <div className="search-result-info">
+                      <div className="search-result-title">{movie.title}</div>
+                      <span className="search-result-meta">IMDb: {movie.imdb || 'N/A'}</span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="search-no-results">
+                  No movies found for "{searchTerm}"
+                </div>
+              )}
+            </div>
+          )}
+        </div>    
+
 
         {/* Mobil Hamburger Menü */}
         <div className={`menu-toggle ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>

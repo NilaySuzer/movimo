@@ -308,3 +308,129 @@
     padding-left: 20px;
   }
 }
+/* ================= NAVBAR SEARCH BAR ================= */
+.nav-search-wrapper {
+  position: relative;
+  flex: 0 1 280px;
+  margin: 0 15px;
+}
+
+.nav-search-form {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 6px 14px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.nav-search-form:focus-within {
+  border-color: #f5c518;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
+}
+
+.nav-search-icon {
+  font-size: 0.85rem;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.nav-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.nav-search-input::placeholder {
+  color: #888;
+}
+
+/* Canlı Arama Sonuç Açılır Paneli (Dropdown) */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 320px;
+  max-height: 380px;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 8px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #eee;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.search-result-item:hover {
+  background: rgba(245, 197, 24, 0.15);
+  transform: translateX(4px);
+}
+
+.search-result-img {
+  width: 42px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.search-result-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.search-result-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.search-result-meta {
+  font-size: 0.8rem;
+  color: #f5c518;
+  margin-top: 2px;
+}
+
+.search-no-results {
+  padding: 15px;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1024px) {
+  .nav-search-wrapper {
+    flex: 0 1 200px;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-search-wrapper {
+    margin: 10px 0;
+    width: 80%;
+  }
+  .search-results-dropdown {
+    width: 100%;
+  }
+}
