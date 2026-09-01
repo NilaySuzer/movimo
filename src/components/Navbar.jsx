@@ -39,8 +39,9 @@ export default function Navbar() {
       <div className="navbar-container">
         {/* Logo */}
         <Link to="/" className="nav-logo" onClick={closeAll}>
-                  <span className="logo-icon">MVM.</span>
-                  <span className="logo-text">MOVİMO</span>
+                  <span className="logo-icon">MMM</span>
+                  <span className="logo-text"> Movimo<span className="accent-dot">.</span>com </span>
+                  
           
         </Link>
 

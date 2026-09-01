@@ -100,7 +100,7 @@ export default function HomePage() {
 
       <div className="general1">
         {/* 2. SEARCH BAR */}
-        <h1>🍿Welcome! Looking for a movie to watch?🍿</h1>
+        <h1> Looking for a movie to watch?🍿</h1>
         <form className="search-form" onSubmit={handleSearch}>
           <input
             className="search-box"

@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="footer-container">
         <div className="footer-col brand-col">
           <div className="footer-logo">
-            <span>🍿</span> Movie<span className="accent-dot">.</span>com
+            <span>🍿</span> Movimo<span className="accent-dot">.</span>com
           </div>
           <p className="footer-text">
             Sinemaseverler için özel olarak hazırlanmış, tarafsız film incelemeleri, öneriler ve topluluk alanı.
