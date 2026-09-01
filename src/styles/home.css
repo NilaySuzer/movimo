@@ -244,3 +244,498 @@
   background: #b20710;
   color: white;
 }
+/* ================= SECTION HEADERS ================= */
+.section-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+
+.section-header-box h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  margin: 0;
+  text-align: left;
+}
+
+.trending-title {
+  color: #ff4757;
+  text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+}
+.top-title {
+  color: #f5c518;
+  text-shadow: 0 0 10px rgba(245, 197, 24, 0.4);
+}
+
+/* ================= HORIZONTAL SCROLL CAROUSEL ================= */
+.horizontal-scroll-container {
+  display: flex;
+  gap: 25px;
+  overflow-x: auto;
+  padding: 15px 5px 25px 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #f5c518 rgba(255, 255, 255, 0.1);
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar-thumb {
+  background: #f5c518;
+  border-radius: 4px;
+}
+
+.horizontal-card {
+  flex: 0 0 240px;
+  background-color: #1818188d;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.horizontal-card:hover {
+  transform: translateY(-8px);
+}
+
+.horizontal-card img {
+  width: 100%;
+  height: 330px;
+  object-fit: cover;
+}
+
+.rank-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.85);
+  border: 1px solid #f5c518;
+  color: #f5c518;
+  font-weight: 800;
+  font-size: 1.1rem;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px rgba(245, 197, 24, 0.6);
+}
+
+/* ================= INTERACTIVE DUAL SECTION (POLL & RECENT REVIEWS) ================= */
+.dual-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.poll-box,
+.community-box {
+  background-color: #1818188d;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: left;
+}
+
+.poll-box h3,
+.community-box h3 {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #f5c518;
+}
+
+.poll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.poll-option-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #eee;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.poll-option-btn:hover {
+  background: rgba(245, 197, 24, 0.2);
+  border-color: #f5c518;
+}
+
+.poll-option-btn.selected {
+  background: #f5c518;
+  color: black;
+  border-color: #f5c518;
+}
+
+/* Mini Yorum Akışı Kartları */
+.reviews-mini-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mini-review-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #f5c518;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.mini-review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.mini-review-header strong {
+  color: #f5c518;
+}
+
+.mini-review-movie {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.mini-review-card p {
+  margin: 0;
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* ================= NEWSLETTER CARD ================= */
+.newsletter-card {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 45px 30px;
+  background-color: #1818188d;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.newsletter-card h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.5rem;
+  letter-spacing: 1.5px;
+  color: #f5c518;
+  margin-bottom: 10px;
+}
+
+.newsletter-card p {
+  color: #ccc;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+}
+
+.newsletter-form {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  max-width: 550px;
+  margin: 0 auto;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  outline: none;
+}
+
+.newsletter-input:focus {
+  border-color: #f5c518;
+}
+
+.newsletter-btn {
+  padding: 12px 28px;
+  background: #f5c518;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.newsletter-btn:hover {
+  background: #b20710;
+  color: white;
+}
+
+@media (max-width: 850px) {
+  .dual-section-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* ================= PREMİUM SİNEMATİK HERO SLIDER ================= */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  background-color: #0a0a0a;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 1s ease;
+  display: flex;
+  align-items: flex-end;
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+}
+
+/* Arka Plan Görseli & Yavaş Zoom Efekti */
+.slide-bg-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  transform: scale(1.08);
+  transition: transform 6s ease-out;
+}
+
+.slide.active .slide-img {
+  transform: scale(1);
+}
+
+/* Sinematik Çok Katmanlı Karartma (Vignette + Alt Geçiş) */
+.slide-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to right,
+      rgba(10, 10, 10, 0.95) 0%,
+      rgba(10, 10, 10, 0.6) 45%,
+      rgba(10, 10, 10, 0.1) 100%
+    ),
+    linear-gradient(
+      to top,
+      #0f0f0f 0%,
+      rgba(15, 15, 15, 0.8) 15%,
+      transparent 60%
+    );
+  pointer-events: none;
+}
+
+/* Cam Efektli Bilgi Paneli */
+.slide-overlay {
+  position: relative;
+  z-index: 3;
+  max-width: 650px;
+  margin-left: 80px;
+  margin-bottom: 70px;
+  padding: 30px;
+  background-color: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  text-align: left;
+  transform: translateY(20px);
+  transition:
+    transform 0.8s ease 0.2s,
+    opacity 0.8s ease 0.2s;
+}
+
+.slide.active .slide-overlay {
+  transform: translateY(0);
+}
+
+.slide-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.slide-badge {
+  background: linear-gradient(135deg, #f5c518, #e5a900);
+  color: #000;
+  padding: 4px 12px;
+  font-weight: 800;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.slide-category {
+  color: #ccc;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.slide-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 3.8rem;
+  line-height: 1;
+  letter-spacing: 2px;
+  color: #fff;
+  margin: 0 0 12px 0;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+}
+
+.slide-desc {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #bbb;
+  margin-bottom: 22px;
+}
+
+.slide-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.slide-btn-primary {
+  background-color: #f5c518;
+  color: #000;
+  padding: 12px 26px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(245, 197, 24, 0.4);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slide-btn-primary:hover {
+  background-color: #b20710;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(178, 7, 16, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Navigasyon Okları */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 5;
+  transition: all 0.3s ease;
+}
+
+.slider-arrow:hover {
+  background: #f5c518;
+  color: black;
+  border-color: #f5c518;
+  box-shadow: 0 0 15px rgba(245, 197, 24, 0.6);
+}
+
+.slider-arrow.prev {
+  left: 25px;
+}
+.slider-arrow.next {
+  right: 25px;
+}
+
+/* Nokta Göstergeleri (Dots / Indicators) */
+.slider-dots {
+  position: absolute;
+  bottom: 25px;
+  right: 80px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.slider-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+  background: #f5c518;
+  width: 32px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #f5c518;
+}
+
+@media (max-width: 768px) {
+  .hero-slider {
+    height: 480px;
+  }
+  .slide-overlay {
+    margin: 0 20px 40px 20px;
+    padding: 20px;
+  }
+  .slide-title {
+    font-size: 2.5rem;
+  }
+  .slider-dots {
+    right: 20px;
+    bottom: 15px;
+  }
+}
