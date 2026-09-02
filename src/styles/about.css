@@ -1,0 +1,216 @@
+.about-wrapper {
+  min-height: 100vh;
+  color: #eee;
+  padding-top: 40px;
+}
+
+.about-hero {
+  max-width: 850px;
+  margin: 0 auto 50px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.about-pill {
+  display: inline-block;
+  background: rgba(245, 197, 24, 0.15);
+  border: 1px solid rgba(245, 197, 24, 0.4);
+  color: #f5c518;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.about-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.highlight-text {
+  color: #f5c518;
+  text-shadow: 0 0 15px rgba(245, 197, 24, 0.4);
+}
+
+.about-subtitle {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: #aaa;
+}
+
+.about-content-container {
+  max-width: 1100px;
+  margin: 0 auto 80px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Vizyon Kartı */
+.vision-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 40px;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  text-align: left;
+}
+
+.vision-text {
+  flex: 1.5;
+}
+
+.vision-text h2 {
+  font-size: 1.8rem;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.vision-text p {
+  color: #ccc;
+  line-height: 1.6;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.vision-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 40px;
+}
+
+.v-stat strong {
+  display: block;
+  font-size: 2.2rem;
+  color: #f5c518;
+  font-weight: 800;
+}
+
+.v-stat span {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* Özellikler Izgarası */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+}
+
+.feature-item {
+  background-color: #1818188d;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 30px 25px;
+  text-align: left;
+  transition: transform 0.3s;
+}
+
+.feature-item:hover {
+  transform: translateY(-6px);
+  border-color: rgba(245, 197, 24, 0.4);
+}
+
+.feature-icon-box {
+  background: rgba(255, 255, 255, 0.06);
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.feature-item h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.feature-item p {
+  color: #aaa;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Teknoloji Kartı */
+.tech-stack-card {
+  background-color: #1818188d;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 35px;
+  text-align: left;
+}
+
+.tech-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tech-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.tech-stack-card p {
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.tech-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tech-badges span {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f5c518;
+}
+
+@media (max-width: 800px) {
+  .vision-card {
+    flex-direction: column;
+  }
+  .vision-stats {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-left: 0;
+    padding-top: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .about-title {
+    font-size: 2rem;
+  }
+}
