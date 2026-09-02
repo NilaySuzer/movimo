@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { movies, comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import '../styles/home.css';
-import Footer from '../components/Footer';
 
 // 1. Hero Slider Verileri
 const featuredSlides = [
@@ -266,8 +265,6 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* 10. FOOTER */}
-      <Footer />
     </div>
   );
 }

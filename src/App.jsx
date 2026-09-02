@@ -4,8 +4,8 @@ import HomePage from './pages/HomePage';
 import MovieDetail from './pages/MovieDetail';
 import './styles/global.css';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import ProfilePage from './pages/ProfilePage';
+import Footer from './components/Footer';
 
 export default function App() {
   return (
@@ -16,6 +16,7 @@ export default function App() {
         <Route path="/movie/:slug" element={<MovieDetail />} />
         <Route path="/profile" element={<ProfilePage />} /> 
       </Routes>
+      <Footer />
     </>
   );
 }

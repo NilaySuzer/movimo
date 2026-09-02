@@ -593,3 +593,39 @@ body.cinema-mode .hero-slider {
     display: none;
   }
 }
+/* Tıklanabilir Nav Butonları */
+.nav-links-btn {
+  background: none;
+  border: none;
+  color: #eee;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.nav-links-btn:hover {
+  color: #f5c518;
+  text-shadow: 0 0 8px rgba(245, 197, 24, 0.6);
+}
+
+.nav-links-btn.active-link {
+  color: #f5c518;
+}
+
+/* Ok İkonu Döndürme Efekti */
+.dropdown-arrow {
+  transition: transform 0.25s ease;
+  color: #aaa;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+  color: #f5c518;
+}
