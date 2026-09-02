@@ -25,6 +25,7 @@ import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import QuickReviewModal from './QuickReviewModal';
 import '../styles/navbar.css';
+import { useMovies } from '../context/MovieContext';
 
 const moodList = [
   { id: 'mindblown', label: 'Mind-Blowing 🤯', labelTr: 'Beyin Yakan 🤯', filter: 'scifi' },
@@ -36,14 +37,11 @@ const moodList = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  
-  // Tek bir state ile hangi dropdown'ın açık olduğunu takip ediyoruz:
-  // null | 'categories' | 'moods' | 'notifications' | 'account'
   const [activeDropdown, setActiveDropdown] = useState(null);
-
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [lang, setLang] = useState('EN');
   const [cinemaMode, setCinemaMode] = useState(false);
+    const { watchlist } = useMovies();
 
   // Arama State'leri
   const [searchTerm, setSearchTerm] = useState('');
