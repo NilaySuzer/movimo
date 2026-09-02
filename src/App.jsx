@@ -5,6 +5,7 @@ import MovieDetail from './pages/MovieDetail';
 import './styles/global.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/movie/:slug" element={<MovieDetail />} />
+        <Route path="/profile" element={<ProfilePage />} /> 
       </Routes>
     </>
   );

@@ -1,0 +1,452 @@
+.profile-container {
+  min-height: 100vh;
+  background-color: #0c0c0e;
+  color: #eee;
+  padding-bottom: 80px;
+}
+
+/* 1. Üst Banner & Degrade */
+.profile-banner-wrapper {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+}
+
+.profile-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.65);
+}
+
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    #0c0c0e 0%,
+    rgba(12, 12, 14, 0.4) 70%,
+    transparent 100%
+  );
+}
+
+.profile-content-wrap {
+  max-width: 1100px;
+  margin: -100px auto 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 5;
+}
+
+/* 2. Profil Bilgi Kartı (Cam Efekti) */
+.profile-header-card {
+  background-color: #1818188d;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 25px rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.profile-avatar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.avatar-wrapper {
+  margin-top: -65px;
+}
+
+.profile-avatar {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f5c518;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    0 0 15px rgba(245, 197, 24, 0.5);
+}
+
+.profile-actions-bar {
+  display: flex;
+  gap: 12px;
+}
+
+.profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 25px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.highlight-btn {
+  background-color: #f5c518;
+  color: #000;
+  box-shadow: 0 2px 10px rgba(245, 197, 24, 0.5);
+}
+
+.highlight-btn:hover {
+  background-color: #b20710;
+  color: #fff;
+  box-shadow: 0 2px 12px #b20710;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.icon-only-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-name {
+  font-size: 2rem;
+  margin: 0;
+  color: #fff;
+  text-align: left;
+}
+
+.user-handle {
+  color: #f5c518;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.user-bio {
+  color: #ccc;
+  font-size: 1.05rem;
+  max-width: 650px;
+  line-height: 1.5;
+  text-align: left;
+  margin-bottom: 25px;
+}
+
+/* İstatistik Kutuları */
+.profile-stats {
+  display: flex;
+  gap: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stat-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.stat-lbl {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.8px;
+}
+
+/* 3. Pinned Favorites Bölümü */
+.pinned-section {
+  margin-bottom: 45px;
+  text-align: left;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.section-title-row h3 {
+  font-size: 1.3rem;
+  color: #fff;
+  margin: 0;
+}
+
+.sub-hint {
+  color: #777;
+  font-size: 0.85rem;
+}
+
+.pinned-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.pinned-card {
+  position: relative;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.pinned-card:hover {
+  transform: translateY(-6px);
+}
+
+.pinned-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pinned-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 10%, transparent 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+  color: #fff;
+}
+
+.pinned-overlay h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.pinned-overlay span {
+  font-size: 0.8rem;
+  color: #f5c518;
+}
+
+/* 4. Sekmeler (Tabs) */
+.profile-tabs-bar {
+  display: flex;
+  gap: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 30px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 12px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.tab-btn:hover {
+  color: #eee;
+}
+
+.tab-btn.active {
+  color: #f5c518;
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #f5c518;
+  box-shadow: 0 0 8px #f5c518;
+}
+
+/* 5. Sekme İçerikleri: Reviews */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.user-review-card {
+  display: flex;
+  gap: 25px;
+  padding: 22px;
+  border-radius: 14px;
+  text-align: left;
+}
+
+.review-film-poster {
+  flex: 0 0 100px;
+  height: 145px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.review-film-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-film-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-top-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-film-name {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.review-film-name:hover {
+  color: #f5c518;
+}
+
+.review-date {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #777;
+  font-size: 0.85rem;
+}
+
+.review-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.rating-num {
+  font-weight: 700;
+  color: #f5c518;
+  font-size: 0.9rem;
+  margin-left: 6px;
+}
+
+.review-text {
+  color: #ddd;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 15px 0;
+}
+
+.review-card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.delete-review-btn {
+  background: none;
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  color: #ff4757;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.delete-review-btn:hover {
+  background: rgba(255, 71, 87, 0.15);
+}
+
+/* Watchlist Grid */
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.watchlist-card {
+  border-radius: 12px;
+  overflow: hidden;
+  padding-bottom: 12px;
+}
+
+.watchlist-card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.watch-now-btn {
+  background-color: #f5c518;
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 90%;
+  transition: 0.2s;
+}
+
+.watch-now-btn:hover {
+  background-color: #b20710;
+  color: #fff;
+}
+
+.empty-tab-state {
+  padding: 60px;
+  text-align: center;
+  border-radius: 14px;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .pinned-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .user-review-card {
+    flex-direction: column;
+  }
+}
