@@ -317,11 +317,6 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/profile" className="dropdown-link" onClick={closeAll}>
-                      <Star size={15} /> {lang === 'TR' ? 'İncelemelerim' : 'My Reviews'}
-                    </Link>
-                  </li>
-                  <li>
                     <Link to="/about" className="dropdown-link" onClick={closeAll}>
                       <Info size={15} /> {lang === 'TR' ? 'Hakkımızda' : 'About'}
                     </Link>
