@@ -1,0 +1,127 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-glass {
+  background: rgba(22, 22, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(245, 197, 24, 0.2);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  padding: 25px 30px;
+  color: #eee;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.modal-form label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.modal-select,
+.modal-textarea {
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-select:focus,
+.modal-textarea:focus {
+  border-color: #f5c518;
+}
+
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.star-icon {
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.star-icon:hover {
+  transform: scale(1.15);
+}
+
+.rating-text {
+  font-weight: 700;
+  color: #f5c518;
+  margin-left: 8px;
+}
+
+.modal-submit-btn {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #f5c518;
+  color: #000;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-submit-btn:hover {
+  background-color: #b20710;
+  color: #fff;
+}

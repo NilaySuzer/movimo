@@ -30,7 +30,7 @@
   text-decoration: none;
   color: #fff;
   font-family: "Bebas Neue", sans-serif;
-  font-size: 2rem;
+  font-size: 1.5rem;
   letter-spacing: 1.5px;
   transition: transform 0.2s ease;
 }
@@ -40,7 +40,7 @@
 }
 
 .logo-icon {
-  font-size: 1.6rem;
+  font-size: 1rem;
   color: #f5c518;
 }
 
@@ -69,12 +69,12 @@
   color: #eee;
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 8px 12px;
+  padding: 4px 10px;
   border-radius: 8px;
   transition: all 0.3s ease;
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 15px;
   cursor: pointer;
 }
 
@@ -292,7 +292,7 @@
     backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: 30px 0;
-    gap: 18px;
+    gap: 10px;
     transition: left 0.3s ease-in-out;
   }
 
@@ -321,7 +321,7 @@
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
-  padding: 6px 14px;
+  padding: 6px 40px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: all 0.3s ease;
@@ -432,5 +432,164 @@
   }
   .search-results-dropdown {
     width: 100%;
+  }
+}
+/* ================= ACTION BUTTONS (+ LOG, MOOD, BELL, CINEMA, LANG) ================= */
+
+/* + Log / Review Butonu */
+.log-review-btn {
+  background: linear-gradient(135deg, #f5c518, #e5a900);
+  color: #000;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(245, 197, 24, 0.4);
+  transition: all 0.3s;
+}
+
+.log-review-btn:hover {
+  background: #b20710;
+  color: #fff;
+  box-shadow: 0 0 12px #b20710;
+  transform: translateY(-2px);
+}
+
+/* İkon Butonları (Bell, Cinema Mode) */
+.icon-action-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ddd;
+  padding: 7px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.icon-action-btn:hover,
+.icon-action-btn.cinema-active {
+  background: rgba(245, 197, 24, 0.2);
+  border-color: #f5c518;
+  color: #f5c518;
+}
+
+/* Bildirim Kırmızı Noktası */
+.notification-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff4757;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #ff4757;
+}
+
+/* Bildirim Paneli */
+.notification-panel {
+  right: 0;
+  left: auto;
+  width: 280px;
+  padding: 12px;
+}
+
+.notif-header h4 {
+  margin: 0 0 10px 0;
+  color: #f5c518;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.notif-item {
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.notif-item.unread {
+  border-left: 3px solid #f5c518;
+}
+
+.notif-item p {
+  margin: 0 0 4px 0;
+  color: #ddd;
+}
+
+.notif-item span {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* Dil Seçici (TR / EN) */
+.lang-badge-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f5c518;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.lang-badge-btn:hover {
+  background: #f5c518;
+  color: #000;
+}
+
+/* Mood Menüsü */
+.mood-menu {
+  min-width: 230px;
+}
+
+.mood-btn {
+  font-size: 0.9rem;
+}
+
+/* ================= CINEMA MODE GLOBAL ETKİSİ ================= */
+body.cinema-mode {
+  background-color: #000000 !important;
+}
+
+body.cinema-mode .category-section,
+body.cinema-mode .site-footer,
+body.cinema-mode .general1 h1 {
+  opacity: 0.2;
+  transition: opacity 0.5s ease;
+}
+
+body.cinema-mode .category-section:hover {
+  opacity: 1;
+}
+
+body.cinema-mode .hero-slider {
+  box-shadow: 0 0 50px rgba(245, 197, 24, 0.3);
+}
+
+.navbar-cinema {
+  background-color: rgba(5, 5, 5, 0.95) !important;
+  border-bottom-color: rgba(245, 197, 24, 0.2) !important;
+}
+
+@media (max-width: 1100px) {
+  .hide-mobile {
+    display: none;
   }
 }
