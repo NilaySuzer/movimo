@@ -1,0 +1,204 @@
+.contact-wrapper {
+  min-height: 100vh;
+  color: #eee;
+  padding-top: 40px;
+}
+
+.contact-hero {
+  max-width: 800px;
+  margin: 0 auto 40px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.contact-pill {
+  display: inline-block;
+  background: rgba(245, 197, 24, 0.15);
+  border: 1px solid rgba(245, 197, 24, 0.4);
+  color: #f5c518;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.contact-hero h1 {
+  font-size: 2.6rem;
+  margin-bottom: 12px;
+  color: #fff;
+  font-weight: 800;
+}
+
+.contact-hero p {
+  color: #aaa;
+  font-size: 1.1rem;
+}
+
+/* İki Sütunlu Ana Kart */
+.contact-main-card {
+  max-width: 1050px;
+  margin: 0 auto 80px auto;
+  padding: 45px;
+  background-color: #1818188d;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  display: flex;
+  gap: 50px;
+  text-align: left;
+}
+
+.contact-left-info {
+  flex: 1;
+}
+
+.contact-left-info h2 {
+  font-size: 1.8rem;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.contact-left-info p {
+  color: #ccc;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.contact-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.meta-item strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.meta-item span {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* Form Alanı */
+.contact-right-form {
+  flex: 1.2;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #bbb;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: #f5c518;
+}
+
+.contact-submit-btn {
+  background-color: #f5c518;
+  color: #000;
+  border: none;
+  padding: 13px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+
+.contact-submit-btn:hover {
+  background-color: #b20710;
+  color: #fff;
+}
+
+/* Başarı Ekranı */
+.submitted-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 15px;
+}
+
+.submitted-success-box h3 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #fff;
+}
+
+.submitted-success-box p {
+  color: #ccc;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.reset-form-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: 0.2s;
+}
+
+.reset-form-btn:hover {
+  background: #f5c518;
+  color: #000;
+}
+
+@media (max-width: 850px) {
+  .contact-main-card {
+    flex-direction: column;
+    padding: 30px;
+  }
+}
