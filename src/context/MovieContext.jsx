@@ -22,12 +22,7 @@ export function MovieProvider({ children }) {
     };
   });
     
-    const updateProfile = (updatedFields) => {
-  setCurrentUser((prev) => ({
-    ...prev,
-    ...updatedFields
-  }));
-};
+
     const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem('movie_watchlist');
     return saved ? JSON.parse(saved) : ['tenet', 'up', 'coco', 'inception'];
@@ -63,8 +58,31 @@ export function MovieProvider({ children }) {
       }
     ];
   });
+   
+    const [lang, setLang] = useState(() => {
+    return localStorage.getItem('movie_lang') || 'TR';
+  });
 
-  // LocalStorage Güncellemeleri
+  // 6. SİNEMA MODU (cinemaMode) - Yenilenince sıfırlanmasın
+  const [cinemaMode, setCinemaMode] = useState(() => {
+    return localStorage.getItem('movie_cinema_mode') === 'true';
+  });
+
+  // 7. TAKİP EDİLENLER (followingList)
+  const [followingList, setFollowingList] = useState(() => {
+    const saved = localStorage.getItem('movie_following');
+    return saved ? JSON.parse(saved) : ['@christophernolan', '@cinephile_girl'];
+  });
+    
+    
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('movie_current_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('movie_current_user');
+    }
+  }, [currentUser]);
+
   useEffect(() => {
     localStorage.setItem('movie_watchlist', JSON.stringify(watchlist));
   }, [watchlist]);
@@ -77,6 +95,23 @@ export function MovieProvider({ children }) {
     localStorage.setItem('movie_user_reviews', JSON.stringify(userReviews));
   }, [userReviews]);
 
+  useEffect(() => {
+    localStorage.setItem('movie_lang', lang);
+  }, [lang]);
+
+  useEffect(() => {
+    localStorage.setItem('movie_cinema_mode', cinemaMode);
+    if (cinemaMode) {
+      document.body.classList.add('cinema-mode');
+    } else {
+      document.body.classList.remove('cinema-mode');
+    }
+  }, [cinemaMode]);
+
+  useEffect(() => {
+    localStorage.setItem('movie_following', JSON.stringify(followingList));
+  }, [followingList]);
+    
     const login = (email, password) => {
     // Backend gelene kadar mock doğrulama
     const user = {
@@ -117,22 +152,25 @@ export function MovieProvider({ children }) {
     localStorage.removeItem('movie_current_user');
   };
     
-    
-  // Watchlist Ekle / Çıkar Toggle
+    const updateProfile = (updatedFields) => {
+    setCurrentUser((prev) => ({
+      ...prev,
+      ...updatedFields
+    }));
+  };
+
   const toggleWatchlist = (slug) => {
-    setWatchlist((prev) => 
+    setWatchlist((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
     );
   };
 
-  // Beğeni Toggle
   const toggleLike = (slug) => {
     setLikedMovies((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
     );
   };
 
-  // Yeni İnceleme Ekleme
   const addReview = (reviewData) => {
     const newEntry = {
       id: Date.now(),
@@ -142,11 +180,20 @@ export function MovieProvider({ children }) {
     setUserReviews((prev) => [newEntry, ...prev]);
   };
 
-  // İnceleme Silme
   const deleteReview = (id) => {
     setUserReviews((prev) => prev.filter((r) => r.id !== id));
   };
 
+  const toggleFollow = (username) => {
+    setFollowingList((prev) => {
+      const isFollowing = prev.includes(username);
+      const updated = isFollowing ? prev.filter(u => u !== username) : [...prev, username];
+      // Takip edilen sayısını da dinamik güncelle
+      setCurrentUser(u => u ? { ...u, following: updated.length } : u);
+      return updated;
+    });
+  };
+  
   return (
     <MovieContext.Provider
         value={{

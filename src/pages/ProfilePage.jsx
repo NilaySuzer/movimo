@@ -71,7 +71,7 @@ export default function ProfilePage() {
     <div className="profile-container">
       {/* 1. BANNER */}
       <div className="profile-banner-wrapper">
-        <img src={initialUserData.banner} alt="Profile Banner" className="profile-banner-img" />
+        <img src={currentUser.banner} alt="Profile Banner" className="profile-banner-img" />
         <div className="banner-overlay"></div>
       </div>
 
@@ -80,7 +80,7 @@ export default function ProfilePage() {
         <div className="profile-header-card glass-panel">
           <div className="profile-avatar-row">
             <div className="avatar-wrapper">
-              <img src={initialUserData.avatar} alt={initialUserData.name} className="profile-avatar" />
+              <img src={currentUser.avatar} alt={currentUser.name} className="profile-avatar" />
             </div>
 
             <div className="profile-actions-bar">
