@@ -13,6 +13,8 @@ import {
   Share2
 } from 'lucide-react';
 import QuickReviewModal from '../components/QuickReviewModal';
+import { useMovies } from '../context/MovieContext';
+import { movies } from '../data/moviesData';
 import '../styles/profile.css';
 
 // Gelecekte backend'den (GET /api/user/profile) gelecek varsayılan mock veri
@@ -67,6 +69,13 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('reviews'); // 'reviews' | 'watchlist' | 'likes'
   const [userData, setUserData] = useState(initialUserData);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+
+  const { watchlist, likedMovies, userReviews, deleteReview } = useMovies();
+
+  // Watchlist'teki slug'ları gerçek film objelerine dönüştür:
+  const watchlistMovies = movies.filter(m => watchlist.includes(m.slug));
+  const likedMoviesList = movies.filter(m => likedMovies.includes(m.slug));
+
 
   // İnceleme silme (backend'de DELETE /api/reviews/:id çağrılacak yer)
   const handleDeleteReview = (id) => {
@@ -160,6 +169,26 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+  
+         <div className="profile-stats">
+      <div className="stat-box">
+        <span className="stat-val">{userData.stats.filmsWatched}</span>
+        <span className="stat-lbl">İncelenen</span>
+      </div>
+      <div className="stat-box">
+        <span className="stat-val">{userData.stats.watchlistCount}</span>
+        <span className="stat-lbl">Watchlist</span>
+      </div>
+      <div className="stat-box">
+        <span className="stat-val">{userData.stats.likesCount}</span>
+        <span className="stat-lbl">Beğenilen</span>
+      </div>
+      <div className="stat-box">
+        <span className="stat-val">{userData.stats.followers}</span>
+        <span className="stat-lbl">Takipçi</span>
+      </div>
+    </div>
+        
 
         {/* 4. SEKMELİ İÇERİK BÖLÜMÜ (TABS) */}
         <div className="profile-tabs-bar">
