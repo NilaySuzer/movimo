@@ -16,11 +16,22 @@ import {
 } from 'lucide-react';
 import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
+import { useMovies } from '../context/MovieContext';
 import '../styles/detail.css';
 
 export default function MovieDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
+
+  // Context hook'umuzdan fonksiyonları ve durumları alıyoruz:
+  const { 
+    isInWatchlist, 
+    toggleWatchlist, 
+    isMovieLiked, 
+    toggleLike,
+    addReview 
+  } = useMovies();
+
 
   const movie = movies.find((m) => m.slug === slug);
   const categoryInfo = categories.find((c) => c.id === movie?.category) || {
@@ -86,9 +97,17 @@ export default function MovieDetail() {
     };
 
     setCommentsList([newCommentObj, ...commentsList]);
+    addReview({
+      slug: movie.slug,
+      movieTitle: movie.displayTitle || movie.title,
+      poster: movie.poster,
+      rating: newCommentRating,
+      comment: newCommentText.trim()
+    });
     setNewCommentName('');
     setNewCommentText('');
     setNewCommentRating(5);
+    alert('İncelemeniz profilinize ve sayfaya kaydedildi! 🍿');
   };
 
   // Paylaşım Butonu
@@ -118,8 +137,8 @@ export default function MovieDetail() {
           {/* Beğen Butonu */}
           <button 
             className={`action-circle-btn ${isLiked ? 'liked' : ''}`}
-            onClick={() => setIsLiked(!isLiked)}
-            title="Beğen"
+            onClick={() => toggleLike(slug)}
+        title={isLiked ? "Beğeniyi Kaldır" : "Beğen"}
           >
             <Heart size={18} fill={isLiked ? "#ff4757" : "none"} color={isLiked ? "#ff4757" : "#fff"} />
           </button>
@@ -127,8 +146,8 @@ export default function MovieDetail() {
           {/* Watchlist Butonu */}
           <button 
             className={`action-circle-btn ${inWatchlist ? 'saved' : ''}`}
-            onClick={() => setInWatchlist(!inWatchlist)}
-            title="İzleme Listeme Ekle"
+           onClick={() => toggleWatchlist(slug)}
+        title={inWatchlist ? "Listemden Çıkar" : "İzleme Listeme Ekle"}
           >
             <Bookmark size={18} fill={inWatchlist ? "#f5c518" : "none"} color={inWatchlist ? "#f5c518" : "#fff"} />
           </button>
