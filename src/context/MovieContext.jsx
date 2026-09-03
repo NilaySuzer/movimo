@@ -4,7 +4,24 @@ const MovieContext = createContext();
 
 export function MovieProvider({ children }) {
   // 1. Watchlist State (Slug dizisi olarak tutulur: ['dark-knight', 'interstellar'])
-  const [watchlist, setWatchlist] = useState(() => {
+  
+    const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem('movie_current_user');
+    return savedUser ? JSON.parse(savedUser) : {
+      id: 'u_1',
+      name: "Nilay Süzer",
+      username: "@nilaysuzer",
+      email: "nilay@example.com",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
+      bio: "Film enthusiast, aspiring cinephile & software developer. Nolan and Tim Burton worshipper 🎬✨",
+      followers: 328,
+      following: 195,
+      isLoggedIn: true // Varsayılan oturum açık
+    };
+  });
+    
+    const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem('movie_watchlist');
     return saved ? JSON.parse(saved) : ['tenet', 'up', 'coco', 'inception'];
   });
@@ -53,6 +70,47 @@ export function MovieProvider({ children }) {
     localStorage.setItem('movie_user_reviews', JSON.stringify(userReviews));
   }, [userReviews]);
 
+    const login = (email, password) => {
+    // Backend gelene kadar mock doğrulama
+    const user = {
+      id: 'u_1',
+      name: "Nilay Süzer",
+      username: `@${email.split('@')[0]}`,
+      email: email,
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
+      bio: "Film enthusiast, aspiring cinephile & software developer. Nolan and Tim Burton worshipper 🎬✨",
+      followers: 328,
+      following: 195,
+      isLoggedIn: true
+    };
+    setCurrentUser(user);
+    return true;
+  };
+
+  const register = (name, email, password) => {
+    const newUser = {
+      id: 'u_' + Date.now(),
+      name: name,
+      username: `@${email.split('@')[0]}`,
+      email: email,
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
+      bio: "Yeni bir sinemasever aramıza katıldı! 🎬",
+      followers: 0,
+      following: 0,
+      isLoggedIn: true
+    };
+    setCurrentUser(newUser);
+    return true;
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('movie_current_user');
+  };
+    
+    
   // Watchlist Ekle / Çıkar Toggle
   const toggleWatchlist = (slug) => {
     setWatchlist((prev) => 
@@ -84,7 +142,11 @@ export function MovieProvider({ children }) {
 
   return (
     <MovieContext.Provider
-      value={{
+        value={{
+          currentUser,
+        login,
+        register,
+        logout,
         watchlist,
         likedMovies,
         userReviews,

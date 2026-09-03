@@ -19,13 +19,14 @@ import {
   Moon, 
   Smile, 
     Globe,
-  Film
+  LogIn
 } from 'lucide-react';
 import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import QuickReviewModal from './QuickReviewModal';
 import '../styles/navbar.css';
 import { useMovies } from '../context/MovieContext';
+import AuthModal from './AuthModal';
 
 const moodList = [
   { id: 'mindblown', label: 'Mind-Blowing 🤯', labelTr: 'Beyin Yakan 🤯', filter: 'scifi' },
@@ -41,7 +42,8 @@ export default function Navbar() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [lang, setLang] = useState('EN');
   const [cinemaMode, setCinemaMode] = useState(false);
-    const { watchlist } = useMovies();
+    const { watchlist, currentUser, logout } = useMovies(); // currentUser ve logout aldık
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Arama State'leri
   const [searchTerm, setSearchTerm] = useState('');
@@ -242,7 +244,7 @@ export default function Navbar() {
               </button>
             </li>
 
-
+            
             {/* 6. BİLDİRİMLER (TIKLAMAYLA AÇILIR) */}
             <li className="nav-item dropdown">
               <button 
@@ -296,48 +298,66 @@ export default function Navbar() {
               </button>
             </li>
 
-            {/* 9. ACCOUNT (TIKLAMAYLA AÇILIR) */}
-            <li className="nav-item dropdown">
-              <button 
-                type="button"
-                className="account-trigger"
-                onClick={() => toggleDropdown('account')}
-              >
-                <div className="avatar-circle">FN</div>
-                <ChevronDown size={13} className={`dropdown-arrow ${activeDropdown === 'account' ? 'rotated' : ''}`} />
-              </button>
+           {currentUser ? (
+    <li className="nav-item dropdown">
+      <button 
+        type="button"
+        className="account-trigger"
+        onClick={() => toggleDropdown('account')}
+      >
+        <div className="avatar-circle">
+          {currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : 'ME'}
+        </div>
+        <ChevronDown size={13} className={`dropdown-arrow ${activeDropdown === 'account' ? 'rotated' : ''}`} />
+      </button>
 
-              {activeDropdown === 'account' && (
-                <ul className="dropdown-menu account-menu glass-panel">
-                  <li>
-                    <Link to="/profile" className="dropdown-link" onClick={closeAll}>
-                      <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Profile'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/about" className="dropdown-link" onClick={closeAll}>
-                      <Info size={15} /> {lang === 'TR' ? 'Hakkımızda' : 'About'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/contact" className="dropdown-link" onClick={closeAll}>
-                      <Mail size={15} /> {lang === 'TR' ? 'İletişim' : 'Contact'}
-                    </Link>
-                  </li>
-                  <li className="divider"></li>
-                  <li>
-                    <button className="dropdown-link logout-btn" onClick={() => { closeAll(); alert('Logged out!'); }}>
-                      <LogOut size={15} /> {lang === 'TR' ? 'Çıkış Yap' : 'Log Out'}
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </li>
+      {activeDropdown === 'account' && (
+        <ul className="dropdown-menu account-menu glass-panel">
+          <li className="account-info-snippet">
+            <strong>{currentUser.name}</strong>
+            <span>{currentUser.username}</span>
+          </li>
+          <li className="divider"></li>
+          <li>
+            <Link to="/profile" className="dropdown-link" onClick={closeAll}>
+              <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Page / Profile'}
+            </Link>
+          </li>
+          <li>
+            <Link to="/about" className="dropdown-link" onClick={closeAll}>
+              <Info size={15} /> {lang === 'TR' ? 'Hakkımızda' : 'About'}
+            </Link>
+          </li>
+          <li>
+            <Link to="/contact" className="dropdown-link" onClick={closeAll}>
+              <Mail size={15} /> {lang === 'TR' ? 'İletişim' : 'Contact'}
+            </Link>
+          </li>
+          <li className="divider"></li>
+          <li>
+            <button className="dropdown-link logout-btn" onClick={() => { closeAll(); logout(); }}>
+              <LogOut size={15} /> {lang === 'TR' ? 'Çıkış Yap' : 'Log Out'}
+            </button>
+          </li>
+        </ul>
+      )}
+    </li>
+  ) : (
+    <li className="nav-item">
+      <button className="nav-login-btn" onClick={() => setIsAuthModalOpen(true)}>
+        <LogIn size={15} />
+        <span>{lang === 'TR' ? 'Giriş Yap/Kayıt ol' : 'Sign In/Register'}</span>
+      </button>
+    </li>
+  )}
 
           </ul>
         </div>
       </nav>
-
+<AuthModal 
+    isOpen={isAuthModalOpen} 
+    onClose={() => setIsAuthModalOpen(false)} 
+  />
       {/* QUICK LOG MODAL */}
       <QuickReviewModal 
         isOpen={isReviewModalOpen} 

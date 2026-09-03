@@ -629,3 +629,40 @@ body.cinema-mode .hero-slider {
   transform: rotate(180deg);
   color: #f5c518;
 }
+.nav-login-btn {
+  background: rgba(245, 197, 24, 0.15);
+  border: 1px solid rgba(245, 197, 24, 0.4);
+  color: #f5c518;
+  padding: 7px 15px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-login-btn:hover {
+  background: #f5c518;
+  color: #000;
+  box-shadow: 0 0 12px rgba(245, 197, 24, 0.5);
+}
+
+.account-info-snippet {
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.account-info-snippet strong {
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.account-info-snippet span {
+  color: #f5c518;
+  font-size: 0.8rem;
+}
