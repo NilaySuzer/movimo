@@ -1,0 +1,214 @@
+.follow-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3200;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.follow-modal-card {
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(20, 20, 24, 0.92);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.95),
+    0 0 25px rgba(245, 197, 24, 0.15);
+  border-radius: 20px;
+  padding: 25px;
+  color: #eee;
+}
+
+.follow-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+
+.follow-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.follow-title-group h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.follow-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #aaa;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.follow-close-btn:hover {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border-color: #ff4757;
+}
+
+/* Tabs */
+.follow-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 18px;
+}
+
+.follow-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #888;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.follow-tab-btn.active {
+  background: #f5c518;
+  color: #000;
+  box-shadow: 0 2px 10px rgba(245, 197, 24, 0.3);
+}
+
+/* Kullanıcı Listesi */
+.follow-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 5px;
+  max-height: 50vh;
+}
+
+.follow-user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.2s;
+}
+
+.follow-user-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.follow-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  flex-shrink: 0;
+}
+
+.follow-user-info {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+.follow-name {
+  display: block;
+  font-size: 0.98rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.follow-handle {
+  display: block;
+  font-size: 0.82rem;
+  color: #f5c518;
+  margin-bottom: 2px;
+}
+
+.follow-bio {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Buton */
+.follow-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  flex-shrink: 0;
+}
+
+.follow-action-btn.not-following {
+  background: #f5c518;
+  color: #000;
+  border: none;
+}
+
+.follow-action-btn.not-following:hover {
+  background: #b20710;
+  color: #fff;
+  box-shadow: 0 0 10px #b20710;
+}
+
+.follow-action-btn.following {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.follow-action-btn.following:hover {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border-color: #ff4757;
+}
+
+.follow-empty-state {
+  padding: 40px 10px;
+  text-align: center;
+  color: #777;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}

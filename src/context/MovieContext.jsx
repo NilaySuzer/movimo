@@ -22,7 +22,7 @@ export function MovieProvider({ children }) {
     };
   });
     
-
+   
     const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem('movie_watchlist');
     return saved ? JSON.parse(saved) : ['tenet', 'up', 'coco', 'inception'];
@@ -34,6 +34,7 @@ export function MovieProvider({ children }) {
     return saved ? JSON.parse(saved) : ['dark-knight', 'interstellar'];
   });
 
+    
   // 3. User Reviews State (Objeler dizisi)
   const [userReviews, setUserReviews] = useState(() => {
     const saved = localStorage.getItem('movie_user_reviews');
@@ -194,11 +195,14 @@ export function MovieProvider({ children }) {
     });
   };
   
+    
   return (
     <MovieContext.Provider
         value={{
               currentUser,
-            updateProfile,
+              updateProfile,
+            followingList,  
+    toggleFollow,
         login,
         register,
         logout,

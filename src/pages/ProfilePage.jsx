@@ -16,6 +16,7 @@ import QuickReviewModal from '../components/QuickReviewModal';
 import { useMovies } from '../context/MovieContext';
 import { movies } from '../data/moviesData';
 import EditProfileModal from '../components/EditProfileModal';
+import FollowModal from '../components/FollowModal';
 import '../styles/profile.css';
 
 const initialUserData = {
@@ -42,9 +43,14 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('reviews'); // 'reviews' | 'watchlist' | 'likes'
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
+  const [followModalTab, setFollowModalTab] = useState('followers');
   // Context'ten dinamik verileri alıyoruz
-  const { watchlist, likedMovies, userReviews, currentUser, deleteReview } = useMovies();
-
+  const { watchlist, followingList, likedMovies, userReviews, currentUser, deleteReview } = useMovies();
+const openFollowModal = (tabName) => {
+    setFollowModalTab(tabName);
+    setIsFollowModalOpen(true);
+  };
   const pinnedList = (currentUser?.pinnedFavorites || ['dark-knight', 'interstellar', 'corpse-bride', 'matrix'])
     .map(slug => movies.find(m => m.slug === slug))
     .filter(Boolean);
@@ -124,14 +130,24 @@ export default function ProfilePage() {
                 <span className="stat-val">{likedMovies.length}</span>
                 <span className="stat-lbl">Likes</span>
               </div>
-              <div className="stat-box">
-                <span className="stat-val">{initialUserData.stats.followers}</span>
-                <span className="stat-lbl">Followers</span>
-              </div>
-              <div className="stat-box">
-                <span className="stat-val">{initialUserData.stats.following}</span>
-                <span className="stat-lbl">Following</span>
-              </div>
+             <div 
+          className="stat-box clickable-stat" 
+          onClick={() => openFollowModal('followers')}
+          title="Takipçileri Görüntüle"
+        >
+          <span className="stat-val">{currentUser.followers || 328}</span>
+          <span className="stat-lbl">Followers</span>
+        </div>
+
+        {/* Tıklanabilir Takip Edilen Kutusu */}
+        <div 
+          className="stat-box clickable-stat" 
+          onClick={() => openFollowModal('following')}
+          title="Takip Edilenleri Görüntüle"
+        >
+          <span className="stat-val">{followingList ? followingList.length : 2}</span>
+          <span className="stat-lbl">Following</span>
+        </div>
             </div>
           </div>
         </div>
@@ -297,7 +313,12 @@ export default function ProfilePage() {
         isOpen={isEditModalOpen} 
         onClose={() => setIsEditModalOpen(false)} 
       />
-
+      
+      <FollowModal 
+        isOpen={isFollowModalOpen} 
+        onClose={() => setIsFollowModalOpen(false)} 
+        initialTab={followModalTab}
+      />
 
       {/* QUICK LOG MODAL */}
       <QuickReviewModal 

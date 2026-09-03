@@ -449,3 +449,19 @@
     flex-direction: column;
   }
 }
+/* Tıklanabilir İstatistik Kutuları */
+.stat-box.clickable-stat {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.stat-box.clickable-stat:hover {
+  transform: translateY(-3px);
+  background: rgba(245, 197, 24, 0.08);
+}
+
+.stat-box.clickable-stat:hover .stat-lbl {
+  color: #f5c518;
+}
