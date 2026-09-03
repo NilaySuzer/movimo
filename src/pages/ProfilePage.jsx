@@ -9,11 +9,13 @@ import {
   Heart, 
   Trash2, 
   Calendar,
+  Share,
   Share2
 } from 'lucide-react';
 import QuickReviewModal from '../components/QuickReviewModal';
 import { useMovies } from '../context/MovieContext';
 import { movies } from '../data/moviesData';
+import EditProfileModal from '../components/EditProfileModal';
 import '../styles/profile.css';
 
 const initialUserData = {
@@ -39,10 +41,13 @@ const initialUserData = {
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('reviews'); // 'reviews' | 'watchlist' | 'likes'
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // Context'ten dinamik verileri alıyoruz
-  const { watchlist, likedMovies, userReviews, deleteReview } = useMovies();
+  const { watchlist, likedMovies, userReviews, currentUser, deleteReview } = useMovies();
 
+  const pinnedList = (currentUser?.pinnedFavorites || ['dark-knight', 'interstellar', 'corpse-bride', 'matrix'])
+    .map(slug => movies.find(m => m.slug === slug))
+    .filter(Boolean);
   // Slug dizilerini gerçek film objeleriyle eşleştiriyoruz
   const watchlistMovies = movies.filter(m => watchlist.includes(m.slug));
   const likedMoviesList = movies.filter(m => likedMovies.includes(m.slug));
@@ -52,6 +57,15 @@ export default function ProfilePage() {
       deleteReview(id); // Doğrudan Context'ten ve LocalStorage'dan siler
     }
   };
+
+   if (!currentUser) {
+    return (
+      <div className="profile-container" style={{ padding: '100px 20px', textAlign: 'center' }}>
+        <h2>Giriş Yapılmadı</h2>
+        <p>Profilinizi görüntülemek için lütfen giriş yapın.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
@@ -74,27 +88,27 @@ export default function ProfilePage() {
                 <PlusCircle size={18} />
                 <span>+ Log / Review</span>
               </button>
-              <button className="profile-btn secondary-btn" onClick={() => alert("Profil düzenleme yakında!")}>
+              <button className="profile-btn secondary-btn" onClick={() => setIsEditModalOpen(true)}>
                 <Settings size={16} />
                 <span>Edit Profile</span>
               </button>
               <button 
-                className="profile-btn icon-only-btn" 
+                className="profile-btn icon-only-btn"
                 title="Share Profile"
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
                   alert('Profil bağlantısı kopyalandı!');
                 }}
               >
-                <Share2 size={16} />
+                <span> <Share2 size={16} /></span>
               </button>
             </div>
           </div>
 
           <div className="profile-info">
-            <h1 className="user-name">{initialUserData.name}</h1>
-            <span className="user-handle">{initialUserData.username}</span>
-            <p className="user-bio">{initialUserData.bio}</p>
+           <h1 className="user-name">{currentUser.name}</h1>
+            <span className="user-handle">{currentUser.username}</span>
+            <p className="user-bio">{currentUser.bio}</p>
 
             {/* Dinamik İstatistikler */}
             <div className="profile-stats">
@@ -129,17 +143,18 @@ export default function ProfilePage() {
             <span className="sub-hint">Pinned to Profile</span>
           </div>
 
-          <div className="pinned-grid">
-            {initialUserData.pinnedFavorites.map(film => (
+        <div className="pinned-grid">
+            {pinnedList.map(film => (
               <Link to={`/movie/${film.slug}`} key={film.slug} className="pinned-card">
                 <img src={film.poster} alt={film.title} />
                 <div className="pinned-overlay">
                   <h4>{film.title}</h4>
-                  <span>{film.year}</span>
+                  <span>{film.year || 2024}</span>
                 </div>
               </Link>
             ))}
           </div>
+        
         </div>
 
         {/* 4. SEKMELER (TABS) */}
@@ -276,6 +291,13 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* EDIT PROFILE MODAL */}
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+      />
+
 
       {/* QUICK LOG MODAL */}
       <QuickReviewModal 

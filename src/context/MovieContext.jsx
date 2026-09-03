@@ -17,10 +17,17 @@ export function MovieProvider({ children }) {
       bio: "Film enthusiast, aspiring cinephile & software developer. Nolan and Tim Burton worshipper 🎬✨",
       followers: 328,
       following: 195,
-      isLoggedIn: true // Varsayılan oturum açık
+      isLoggedIn: true,// Varsayılan oturum açık
+      pinnedFavorites: ['dark-knight', 'interstellar', 'corpse-bride', 'matrix']
     };
   });
     
+    const updateProfile = (updatedFields) => {
+  setCurrentUser((prev) => ({
+    ...prev,
+    ...updatedFields
+  }));
+};
     const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem('movie_watchlist');
     return saved ? JSON.parse(saved) : ['tenet', 'up', 'coco', 'inception'];
@@ -143,7 +150,8 @@ export function MovieProvider({ children }) {
   return (
     <MovieContext.Provider
         value={{
-          currentUser,
+              currentUser,
+            updateProfile,
         login,
         register,
         logout,
