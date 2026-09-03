@@ -7,7 +7,6 @@ import {
   Star, 
   Bookmark, 
   Heart, 
-  Film, 
   Trash2, 
   Calendar,
   Share2
@@ -17,7 +16,6 @@ import { useMovies } from '../context/MovieContext';
 import { movies } from '../data/moviesData';
 import '../styles/profile.css';
 
-// Gelecekte backend'den (GET /api/user/profile) gelecek varsayılan mock veri
 const initialUserData = {
   name: "Nilay Süzer",
   username: "@nilaysuzer",
@@ -25,7 +23,6 @@ const initialUserData = {
   banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
   bio: "Film enthusiast, aspiring cinephile & software developer. Nolan and Tim Burton worshipper 🎬✨",
   stats: {
-    filmsWatched: 142,
     thisYear: 28,
     listsCount: 6,
     followers: 328,
@@ -36,72 +33,40 @@ const initialUserData = {
     { slug: 'interstellar', title: 'Interstellar', poster: '/imgs/interstelllar.png', year: 2014 },
     { slug: 'corpse-bride', title: 'Corpse Bride', poster: '/imgs/corpseb.png', year: 2005 },
     { slug: 'matrix', title: 'Matrix', poster: '/imgs/matrix.png', year: 1999 }
-  ],
-  reviews: [
-    {
-      id: 1,
-      slug: 'dark-knight',
-      movieTitle: 'The Dark Knight',
-      poster: '/imgs/dk.png',
-      rating: 5,
-      date: '2 gün önce',
-      comment: "Sinema tarihinin en ikonik kötü karakter performansına sahip başyapıt. Her izleyişimde detaylar daha da parlıyor."
-    },
-    {
-      id: 2,
-      slug: 'corpse-bride',
-      movieTitle: 'Corpse Bride',
-      poster: '/imgs/corpseb.png',
-      rating: 4.5,
-      date: '1 hafta önce',
-      comment: "Stop-motion tekniğinin zirvesi. Gotik ve melankolik atmosferi müzikleriyle birleşince büyüleyici oluyor."
-    }
-  ],
-  watchlist: [
-    { slug: 'tenet', title: 'Tenet', poster: '/imgs/tenet.png', year: 2020 },
-    { slug: 'up', title: 'Up', poster: '/imgs/up.png', year: 2009 },
-    { slug: 'coco', title: 'Coco', poster: '/imgs/coco.png', year: 2017 },
-    { slug: 'inception', title: 'Inception', poster: '/imgs/inc.png', year: 2010 }
   ]
 };
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('reviews'); // 'reviews' | 'watchlist' | 'likes'
-  const [userData, setUserData] = useState(initialUserData);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
+  // Context'ten dinamik verileri alıyoruz
   const { watchlist, likedMovies, userReviews, deleteReview } = useMovies();
 
-  // Watchlist'teki slug'ları gerçek film objelerine dönüştür:
+  // Slug dizilerini gerçek film objeleriyle eşleştiriyoruz
   const watchlistMovies = movies.filter(m => watchlist.includes(m.slug));
   const likedMoviesList = movies.filter(m => likedMovies.includes(m.slug));
 
-
-  // İnceleme silme (backend'de DELETE /api/reviews/:id çağrılacak yer)
   const handleDeleteReview = (id) => {
     if (window.confirm("Bu incelemeyi silmek istediğinize emin misiniz?")) {
-      setUserData(prev => ({
-        ...prev,
-        reviews: prev.reviews.filter(r => r.id !== id),
-        stats: { ...prev.stats, filmsWatched: prev.stats.filmsWatched - 1 }
-      }));
+      deleteReview(id); // Doğrudan Context'ten ve LocalStorage'dan siler
     }
   };
 
   return (
     <div className="profile-container">
-      {/* 1. SİNEMATİK BANNER */}
+      {/* 1. BANNER */}
       <div className="profile-banner-wrapper">
-        <img src={userData.banner} alt="Profile Banner" className="profile-banner-img" />
+        <img src={initialUserData.banner} alt="Profile Banner" className="profile-banner-img" />
         <div className="banner-overlay"></div>
       </div>
 
       <div className="profile-content-wrap">
-        {/* 2. PROFİL ÜST BİLGİ ALANI */}
+        {/* 2. PROFİL ÜST KART */}
         <div className="profile-header-card glass-panel">
           <div className="profile-avatar-row">
             <div className="avatar-wrapper">
-              <img src={userData.avatar} alt={userData.name} className="profile-avatar" />
+              <img src={initialUserData.avatar} alt={initialUserData.name} className="profile-avatar" />
             </div>
 
             <div className="profile-actions-bar">
@@ -113,44 +78,51 @@ export default function ProfilePage() {
                 <Settings size={16} />
                 <span>Edit Profile</span>
               </button>
-              <button className="profile-btn icon-only-btn" title="Share Profile">
+              <button 
+                className="profile-btn icon-only-btn" 
+                title="Share Profile"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Profil bağlantısı kopyalandı!');
+                }}
+              >
                 <Share2 size={16} />
               </button>
             </div>
           </div>
 
           <div className="profile-info">
-            <h1 className="user-name">{userData.name}</h1>
-            <span className="user-handle">{userData.username}</span>
-            <p className="user-bio">{userData.bio}</p>
+            <h1 className="user-name">{initialUserData.name}</h1>
+            <span className="user-handle">{initialUserData.username}</span>
+            <p className="user-bio">{initialUserData.bio}</p>
 
-            {/* İstatistikler */}
+            {/* Dinamik İstatistikler */}
             <div className="profile-stats">
               <div className="stat-box">
-                <span className="stat-val">{userData.stats.filmsWatched}</span>
-                <span className="stat-lbl">Films</span>
+                <span className="stat-val">{userReviews.length}</span>
+                <span className="stat-lbl">Reviews</span>
               </div>
               <div className="stat-box">
-                <span className="stat-val">{userData.stats.thisYear}</span>
-                <span className="stat-lbl">This Year</span>
+                <span className="stat-val">{watchlist.length}</span>
+                <span className="stat-lbl">Watchlist</span>
               </div>
               <div className="stat-box">
-                <span className="stat-val">{userData.stats.listsCount}</span>
-                <span className="stat-lbl">Lists</span>
+                <span className="stat-val">{likedMovies.length}</span>
+                <span className="stat-lbl">Likes</span>
               </div>
               <div className="stat-box">
-                <span className="stat-val">{userData.stats.followers}</span>
+                <span className="stat-val">{initialUserData.stats.followers}</span>
                 <span className="stat-lbl">Followers</span>
               </div>
               <div className="stat-box">
-                <span className="stat-val">{userData.stats.following}</span>
+                <span className="stat-val">{initialUserData.stats.following}</span>
                 <span className="stat-lbl">Following</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 3. PINNED FAVORITES (SABİTLENMİŞ 4 FAVORİ) */}
+        {/* 3. PINNED FAVORITES */}
         <div className="pinned-section">
           <div className="section-title-row">
             <h3>📌 Favorite Masterpieces</h3>
@@ -158,7 +130,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="pinned-grid">
-            {userData.pinnedFavorites.map(film => (
+            {initialUserData.pinnedFavorites.map(film => (
               <Link to={`/movie/${film.slug}`} key={film.slug} className="pinned-card">
                 <img src={film.poster} alt={film.title} />
                 <div className="pinned-overlay">
@@ -169,132 +141,143 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
-  
-         <div className="profile-stats">
-      <div className="stat-box">
-        <span className="stat-val">{userData.stats.filmsWatched}</span>
-        <span className="stat-lbl">İncelenen</span>
-      </div>
-      <div className="stat-box">
-        <span className="stat-val">{userData.stats.watchlistCount}</span>
-        <span className="stat-lbl">Watchlist</span>
-      </div>
-      <div className="stat-box">
-        <span className="stat-val">{userData.stats.likesCount}</span>
-        <span className="stat-lbl">Beğenilen</span>
-      </div>
-      <div className="stat-box">
-        <span className="stat-val">{userData.stats.followers}</span>
-        <span className="stat-lbl">Takipçi</span>
-      </div>
-    </div>
-        
 
-        {/* 4. SEKMELİ İÇERİK BÖLÜMÜ (TABS) */}
+        {/* 4. SEKMELER (TABS) */}
         <div className="profile-tabs-bar">
           <button 
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
             <Star size={17} />
-            My Reviews ({userData.reviews.length})
+            My Reviews ({userReviews.length})
           </button>
           <button 
             className={`tab-btn ${activeTab === 'watchlist' ? 'active' : ''}`}
             onClick={() => setActiveTab('watchlist')}
           >
             <Bookmark size={17} />
-            Watchlist ({userData.watchlist.length})
+            Watchlist ({watchlistMovies.length})
           </button>
           <button 
             className={`tab-btn ${activeTab === 'likes' ? 'active' : ''}`}
             onClick={() => setActiveTab('likes')}
           >
             <Heart size={17} />
-            Likes
+            Likes ({likedMoviesList.length})
           </button>
         </div>
 
         {/* TAB İÇERİKLERİ */}
         <div className="tab-body">
-          {/* A. REVIEWS SEKME İÇERİĞİ */}
+          {/* A. REVIEWS (Context'teki userReviews listelenir) */}
           {activeTab === 'reviews' && (
             <div className="reviews-list">
-              {userData.reviews.map(item => (
-                <div key={item.id} className="user-review-card glass-panel">
-                  <Link to={`/movie/${item.slug}`} className="review-film-poster">
-                    <img src={item.poster} alt={item.movieTitle} />
-                  </Link>
+              {userReviews.length > 0 ? (
+                userReviews.map(item => (
+                  <div key={item.id} className="user-review-card glass-panel">
+                    <Link to={`/movie/${item.slug}`} className="review-film-poster">
+                      <img src={item.poster} alt={item.movieTitle} />
+                    </Link>
 
-                  <div className="review-film-details">
-                    <div className="review-top-line">
-                      <Link to={`/movie/${item.slug}`} className="review-film-name">
-                        {item.movieTitle}
-                      </Link>
-                      <div className="review-date">
-                        <Calendar size={13} />
-                        <span>{item.date}</span>
+                    <div className="review-film-details">
+                      <div className="review-top-line">
+                        <Link to={`/movie/${item.slug}`} className="review-film-name">
+                          {item.movieTitle}
+                        </Link>
+                        <div className="review-date">
+                          <Calendar size={13} />
+                          <span>{item.date}</span>
+                        </div>
+                      </div>
+
+                      <div className="review-rating-row">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star 
+                            key={i} 
+                            size={16} 
+                            color="#f5c518" 
+                            fill={i < Math.floor(item.rating) ? "#f5c518" : "none"} 
+                          />
+                        ))}
+                        <span className="rating-num">{item.rating}/5</span>
+                      </div>
+
+                      <p className="review-text">{item.comment}</p>
+
+                      <div className="review-card-footer">
+                        <button 
+                          className="delete-review-btn" 
+                          onClick={() => handleDeleteReview(item.id)}
+                          title="Delete review"
+                        >
+                          <Trash2 size={15} /> Sil
+                        </button>
                       </div>
                     </div>
-
-                    {/* Yıldızlı Puan */}
-                    <div className="review-rating-row">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star 
-                          key={i} 
-                          size={16} 
-                          color="#f5c518" 
-                          fill={i < Math.floor(item.rating) ? "#f5c518" : "none"} 
-                        />
-                      ))}
-                      <span className="rating-num">{item.rating}/5</span>
-                    </div>
-
-                    <p className="review-text">{item.comment}</p>
-
-                    <div className="review-card-footer">
-                      <button 
-                        className="delete-review-btn" 
-                        onClick={() => handleDeleteReview(item.id)}
-                        title="Delete review"
-                      >
-                        <Trash2 size={15} /> Sil
-                      </button>
-                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="empty-tab-state glass-panel">
+                  <Star size={40} color="#777" />
+                  <p>Henüz bir inceleme yazmadın. + Log butonuna tıklayarak ilk incelemeni paylaş!</p>
                 </div>
-              ))}
+              )}
             </div>
           )}
 
-          {/* B. WATCHLIST SEKME İÇERİĞİ */}
+          {/* B. WATCHLIST (Context'teki watchlist listelenir) */}
           {activeTab === 'watchlist' && (
             <div className="watchlist-grid">
-              {userData.watchlist.map(film => (
-                <div key={film.slug} className="watchlist-card glass-panel">
-                  <img src={film.poster} alt={film.title} />
-                  <div className="watchlist-info">
-                    <div className="card-title">{film.title}</div>
-                    <Link to={`/movie/${film.slug}`}>
-                      <button className="watch-now-btn">Go to Movie</button>
-                    </Link>
+              {watchlistMovies.length > 0 ? (
+                watchlistMovies.map(film => (
+                  <div key={film.slug} className="watchlist-card glass-panel">
+                    <img src={film.poster} alt={film.title} />
+                    <div className="watchlist-info">
+                      <div className="card-title">{film.title}</div>
+                      <Link to={`/movie/${film.slug}`}>
+                        <button className="watch-now-btn">Go to Movie</button>
+                      </Link>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="empty-tab-state glass-panel">
+                  <Bookmark size={40} color="#777" />
+                  <p>İzleme listenizde henüz film yok.</p>
                 </div>
-              ))}
+              )}
             </div>
           )}
 
-          {/* C. LIKES SEKME İÇERİĞİ */}
+          {/* C. LIKES (Context'teki likedMovies listelenir) */}
           {activeTab === 'likes' && (
-            <div className="empty-tab-state glass-panel">
-              <Heart size={42} color="#ff4757" />
-              <p>Beğendiğin filmler burada listelenecektir.</p>
+            <div className="watchlist-grid">
+              {likedMoviesList.length > 0 ? (
+                likedMoviesList.map(film => (
+                  <div key={film.slug} className="watchlist-card glass-panel">
+                    <img src={film.poster} alt={film.title} />
+                    <div className="watchlist-info">
+                      <div className="card-title">{film.title}</div>
+                      <Link to={`/movie/${film.slug}`}>
+                        <button className="watch-now-btn" style={{ background: '#ff4757', color: '#fff' }}>
+                          Go to Movie
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-tab-state glass-panel">
+                  <Heart size={40} color="#777" />
+                  <p>Henüz beğendiğin bir film yok.</p>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* QUICK LOG MODALI */}
+      {/* QUICK LOG MODAL */}
       <QuickReviewModal 
         isOpen={isLogModalOpen} 
         onClose={() => setIsLogModalOpen(false)} 

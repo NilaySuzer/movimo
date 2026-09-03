@@ -5,8 +5,8 @@ import { useMovies } from '../context/MovieContext';
 import '../styles/modal.css';
 
 export default function QuickReviewModal({ isOpen, onClose, lang }) {
-    const [selectedMovie, setSelectedMovie] = useState('');
-    const { addReview } = useMovies();
+  const [selectedMovie, setSelectedMovie] = useState('');
+  const { addReview } = useMovies();
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -15,16 +15,19 @@ export default function QuickReviewModal({ isOpen, onClose, lang }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-      if (!selectedMovie || !comment.trim()) return;
-      const targetMovie = movies.find(m => m.title === selectedMovie);
+    if (!selectedMovie || !comment.trim()) return;
+    const targetMovie = movies.find(m => m.title === selectedMovie);
 
+    // user alanını ekleyerek Context ile tam uyumlu hale getiriyoruz
     addReview({
       slug: targetMovie ? targetMovie.slug : 'custom',
       movieTitle: selectedMovie,
       poster: targetMovie ? targetMovie.poster : '/imgs/dk.png',
       rating,
-      comment: comment.trim()
+      comment: comment.trim(),
+      user: 'Nilay Süzer' // Profil sahibi adı
     });
+
     alert(lang === 'TR' ? 'İncelemeniz başarıyla paylaşıldı! 🎬' : 'Review posted successfully! 🎬');
     setSelectedMovie('');
     setComment('');

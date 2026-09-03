@@ -8,10 +8,8 @@ import {
   ArrowLeft, 
   Star, 
   Send, 
-  Film, 
   X, 
   Tv, 
-  Calendar,
   MessageSquare
 } from 'lucide-react';
 import { movies } from '../data/moviesData';
@@ -23,15 +21,15 @@ export default function MovieDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  // Context hook'umuzdan fonksiyonları ve durumları alıyoruz:
+  // Context'ten dinamik fonksiyon ve durumları alıyoruz
   const { 
     isInWatchlist, 
     toggleWatchlist, 
     isMovieLiked, 
     toggleLike,
-    addReview 
+    addReview,
+    userReviews 
   } = useMovies();
-
 
   const movie = movies.find((m) => m.slug === slug);
   const categoryInfo = categories.find((c) => c.id === movie?.category) || {
@@ -39,13 +37,13 @@ export default function MovieDetail() {
     name: 'Featured'
   };
 
-  // State'ler
-  const [isLiked, setIsLiked] = useState(false);
-  const [inWatchlist, setInWatchlist] = useState(false);
+  // Doğrudan Context üzerinden aktif durumu okuyoruz
+  const isLiked = isMovieLiked(slug);
+  const inWatchlist = isInWatchlist(slug);
+
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
 
-  // Yorum State'leri
-  const [commentsList, setCommentsList] = useState(movie?.comments || []);
+  // Yorum Formu State'leri
   const [newCommentName, setNewCommentName] = useState('');
   const [newCommentText, setNewCommentText] = useState('');
   const [newCommentRating, setNewCommentRating] = useState(5);
@@ -53,10 +51,7 @@ export default function MovieDetail() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (movie) {
-      setCommentsList(movie.comments || []);
-    }
-  }, [slug, movie]);
+  }, [slug]);
 
   if (!movie) {
     return (
@@ -69,54 +64,56 @@ export default function MovieDetail() {
     );
   }
 
+  // Hem film verisindeki statik yorumları hem de Context'e sonradan eklenen yorumları birleştiriyoruz
+  const movieContextReviews = userReviews
+    .filter((r) => r.slug === slug)
+    .map((r) => ({
+      user: r.user || 'Sen (İncelemen)',
+      text: r.comment || r.text,
+      rating: r.rating,
+      date: r.date || 'Az önce'
+    }));
+
+  const allComments = [...movieContextReviews, ...(movie.comments || [])];
+
   const themeColor = categoryInfo.color;
   const dynamicBackground = `radial-gradient(circle at top right, ${themeColor}22 0%, #0d0d11 60%)`;
 
-  // YouTube Linkinden Embed ID çıkarma fonksiyonu
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length === 11) 
-      ? `https://www.youtube.com/embed/${match[2]}?autoplay=1` 
+    return match && match[2].length === 11
+      ? `https://www.youtube.com/embed/${match[2]}?autoplay=1`
       : null;
   };
 
   const embedUrl = getYouTubeEmbedUrl(movie.trailerUrl);
 
-  // Yorum Gönderme Fonksiyonu
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     if (!newCommentName.trim() || !newCommentText.trim()) return;
 
-    const newCommentObj = {
-      user: newCommentName.trim(),
-      text: newCommentText.trim(),
-      rating: newCommentRating,
-      date: 'Az önce'
-    };
-
-    setCommentsList([newCommentObj, ...commentsList]);
+    // Context'e ekle (localStorage otomatik tetiklenir)
     addReview({
       slug: movie.slug,
       movieTitle: movie.displayTitle || movie.title,
       poster: movie.poster,
       rating: newCommentRating,
-      comment: newCommentText.trim()
+      comment: newCommentText.trim(),
+      user: newCommentName.trim()
     });
+
     setNewCommentName('');
     setNewCommentText('');
     setNewCommentRating(5);
-    alert('İncelemeniz profilinize ve sayfaya kaydedildi! 🍿');
   };
 
-  // Paylaşım Butonu
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     alert('Film bağlantısı panoya kopyalandı! 🔗');
   };
 
-  // Benzer Filmler (Aynı kategorideki diğer filmler)
   const similarMovies = movies
     .filter((m) => m.category === movie.category && m.slug !== movie.slug)
     .slice(0, 4);
@@ -134,20 +131,20 @@ export default function MovieDetail() {
         </button>
 
         <div className="detail-actions-cluster">
-          {/* Beğen Butonu */}
+          {/* Beğen Butonu (Context Toggle) */}
           <button 
             className={`action-circle-btn ${isLiked ? 'liked' : ''}`}
             onClick={() => toggleLike(slug)}
-        title={isLiked ? "Beğeniyi Kaldır" : "Beğen"}
+            title={isLiked ? "Beğeniyi Kaldır" : "Beğen"}
           >
             <Heart size={18} fill={isLiked ? "#ff4757" : "none"} color={isLiked ? "#ff4757" : "#fff"} />
           </button>
 
-          {/* Watchlist Butonu */}
+          {/* Watchlist Butonu (Context Toggle) */}
           <button 
             className={`action-circle-btn ${inWatchlist ? 'saved' : ''}`}
-           onClick={() => toggleWatchlist(slug)}
-        title={inWatchlist ? "Listemden Çıkar" : "İzleme Listeme Ekle"}
+            onClick={() => toggleWatchlist(slug)}
+            title={inWatchlist ? "Listemden Çıkar" : "İzleme Listeme Ekle"}
           >
             <Bookmark size={18} fill={inWatchlist ? "#f5c518" : "none"} color={inWatchlist ? "#f5c518" : "#fff"} />
           </button>
@@ -165,7 +162,6 @@ export default function MovieDetail() {
 
       {/* ANA DETAY ALANI (POSTER + BİLGİ KARTI) */}
       <div className="detail-main-layout">
-        {/* POSTER & HIZLI İZLEME AKSİYONLARI */}
         <div className="movie-poster-card">
           <div className="poster-img-container">
             <img src={movie.poster} alt={movie.title} />
@@ -189,7 +185,6 @@ export default function MovieDetail() {
           </div>
         </div>
 
-        {/* BİLGİ KARTI (CAM / GLASSMORPHISM) */}
         <div className="movie-info-card glass-panel">
           <div className="movie-badge-row">
             <span className="movie-category-tag" style={{ borderColor: themeColor, color: themeColor }}>
@@ -208,7 +203,6 @@ export default function MovieDetail() {
             <p>{movie.description || 'Bu film için henüz detaylı açıklama eklenmemiş.'}</p>
           </div>
 
-          {/* Hızlı İnceleme Yaz Butonu */}
           <div className="jump-review-bar">
             <a href="#comment-section" className="review-jump-btn" style={{ backgroundColor: themeColor }}>
               <MessageSquare size={17} />
@@ -218,7 +212,7 @@ export default function MovieDetail() {
         </div>
       </div>
 
-      {/* GÖMÜLÜ FRAGMAN MODALI (POPUP) */}
+      {/* GÖMÜLÜ FRAGMAN MODALI */}
       {isTrailerOpen && embedUrl && (
         <div className="trailer-modal-backdrop" onClick={() => setIsTrailerOpen(false)}>
           <div className="trailer-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -238,14 +232,14 @@ export default function MovieDetail() {
         </div>
       )}
 
-      {/* YORUMLAR VE İNCELEME YAZMA ALANI */}
+      {/* YORUMLAR BÖLÜMÜ */}
       <section id="comment-section" className="comments-module-container">
         <div className="comments-header">
-          <h2>💬 Kullanıcı İncelemeleri ({commentsList.length})</h2>
+          <h2>💬 Kullanıcı İncelemeleri ({allComments.length})</h2>
         </div>
 
         <div className="comments-dual-grid">
-          {/* 1. YORUM YAZMA FORMU */}
+          {/* YORUM YAZMA FORMU */}
           <div className="comment-form-card glass-panel">
             <h3>Bu Filmi Puanla & Yorumla</h3>
             <form onSubmit={handleCommentSubmit}>
@@ -297,10 +291,10 @@ export default function MovieDetail() {
             </form>
           </div>
 
-          {/* 2. YORUMLARIN LİSTESİ */}
+          {/* YORUMLARIN LİSTESİ */}
           <div className="comments-list-feed">
-            {commentsList.length > 0 ? (
-              commentsList.map((c, index) => (
+            {allComments.length > 0 ? (
+              allComments.map((c, index) => (
                 <div key={index} className="single-comment-card glass-panel">
                   <div className="comment-card-top">
                     <strong className="commenter-name" style={{ color: themeColor }}>
@@ -327,7 +321,7 @@ export default function MovieDetail() {
         </div>
       </section>
 
-      {/* BENZER FİLMLER (MORE LIKE THIS) */}
+      {/* BENZER FİLMLER */}
       {similarMovies.length > 0 && (
         <section className="similar-movies-section">
           <div className="similar-header">
@@ -346,7 +340,6 @@ export default function MovieDetail() {
           </div>
         </section>
       )}
-
     </div>
   );
 }
