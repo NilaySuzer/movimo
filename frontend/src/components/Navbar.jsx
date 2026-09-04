@@ -246,33 +246,35 @@ export default function Navbar() {
 
             
             {/* 6. BİLDİRİMLER (TIKLAMAYLA AÇILIR) */}
-            <li className="nav-item dropdown">
-              <button 
-                type="button"
-                className={`icon-action-btn ${activeDropdown === 'notifications' ? 'cinema-active' : ''}`}
-                onClick={() => toggleDropdown('notifications')}
-                title="Notifications"
-              >
-                <Bell size={18} />
-                <span className="notification-dot"></span>
-              </button>
+           {currentUser && (
+  <li className="nav-item dropdown">
+    <button 
+      type="button"
+      className={`icon-action-btn ${activeDropdown === 'notifications' ? 'cinema-active' : ''}`}
+      onClick={() => toggleDropdown('notifications')}
+      title="Notifications"
+    >
+      <Bell size={18} />
+      <span className="notification-dot"></span>
+    </button>
 
-              {activeDropdown === 'notifications' && (
-                <div className="dropdown-menu notification-panel glass-panel">
-                  <div className="notif-header">
-                    <h4>{lang === 'TR' ? 'Bildirimler' : 'Notifications'}</h4>
-                  </div>
-                  <div className="notif-item unread">
-                    <p><strong>Bruce K.</strong> {lang === 'TR' ? 'The Dark Knight yorumunu beğendi.' : 'liked your review on The Dark Knight.'}</p>
-                    <span>10m ago</span>
-                  </div>
-                  <div className="notif-item">
-                    <p>🎬 <strong>Haftanın Filmi:</strong> {lang === 'TR' ? 'Interstellar trendlere girdi!' : 'Interstellar is trending now!'}</p>
-                    <span>2h ago</span>
-                  </div>
-                </div>
-              )}
-            </li>
+    {activeDropdown === 'notifications' && (
+      <div className="dropdown-menu notification-panel glass-panel">
+        <div className="notif-header">
+          <h4>{lang === 'TR' ? 'Bildirimler' : 'Notifications'}</h4>
+        </div>
+        <div className="notif-item unread">
+          <p><strong>Bruce K.</strong> {lang === 'TR' ? 'The Dark Knight yorumunu beğendi.' : 'liked your review on The Dark Knight.'}</p>
+          <span>10m ago</span>
+        </div>
+        <div className="notif-item">
+          <p>🎬 <strong>Haftanın Filmi:</strong> {lang === 'TR' ? 'Interstellar trendlere girdi!' : 'Interstellar is trending now!'}</p>
+          <span>2h ago</span>
+        </div>
+      </div>
+    )}
+  </li>
+)}
 
             {/* 7. CINEMA MODE TOGGLE */}
             <li className="nav-item">
