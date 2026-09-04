@@ -526,6 +526,46 @@
   z-index: 2;
 }
 
+@media (max-width: 768px) {
+  .slide-bg-container {
+    bottom: 20px;
+    left: 15px;
+    right: 15px;
+    max-width: calc(100% - 30px);
+    padding: 16px;
+  }
+
+  .slide-title {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+
+  .hero-slide-content p {
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+
+  /* Butonları dikey değil enine sırala */
+  .slide-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .slide-btn-primary {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 0.85rem;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
 /* Arka Plan Görseli & Yavaş Zoom Efekti */
 .slide-bg-container {
   position: absolute;

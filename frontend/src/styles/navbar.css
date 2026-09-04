@@ -666,3 +666,62 @@ body.cinema-mode .hero-slider {
   color: #f5c518;
   font-size: 0.8rem;
 }
+@media (max-width: 960px) {
+  .nav-menu {
+    /* Menünün ekran boyunu aşabilmesi ve kaydırılabilmesi için */
+    max-height: calc(100vh - 75px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 30px;
+  }
+
+  .mobile-only-auth {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-user-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-user-greeting {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #aaa;
+  }
+
+  .mobile-user-greeting strong {
+    color: #f5c518;
+    font-size: 1rem;
+  }
+
+  .mobile-logout-btn {
+    background: rgba(255, 71, 87, 0.15);
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    color: #ff4757;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+}
+
+@media (min-width: 961px) {
+  .mobile-only-auth {
+    display: none;
+  }
+}

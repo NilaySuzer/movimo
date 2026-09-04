@@ -361,7 +361,6 @@ export default function Navbar() {
       </button>
     </li>
   )}
-
           </ul>
         </div>
       </nav>
