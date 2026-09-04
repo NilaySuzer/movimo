@@ -109,6 +109,151 @@
   margin-bottom: 8px;
   font-size: 1.05rem;
 }
+
+.comments-module-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  text-align: left;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.scroll-hint-pill {
+  font-size: 0.82rem;
+  color: #888;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Enine Yorum Formu */
+.comment-form-wide {
+  background: rgba(24, 24, 24, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 25px;
+}
+
+.form-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-header-line h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.wide-inputs-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.user-input-col {
+  flex: 0 0 220px;
+  margin-bottom: 0;
+}
+
+.text-input-col {
+  flex: 1;
+  min-width: 260px;
+  margin-bottom: 0;
+}
+
+.text-input-col textarea {
+  resize: vertical;
+  min-height: 48px;
+}
+
+.submit-comment-btn-inline {
+  height: 46px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s;
+}
+
+.submit-comment-btn-inline:hover {
+  background: #b20710 !important;
+  color: #fff;
+}
+
+/* Scroll Edilebilir İncelemeler Listesi */
+.comments-scroll-feed {
+  max-height: 380px; /* Sabit tavan yükseklik */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 8px;
+}
+
+/* Özel Şık Scrollbar */
+.comments-scroll-feed::-webkit-scrollbar {
+  width: 6px;
+}
+.comments-scroll-feed::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+.comments-scroll-feed::-webkit-scrollbar-thumb {
+  background: rgba(245, 197, 24, 0.4);
+  border-radius: 10px;
+}
+.comments-scroll-feed::-webkit-scrollbar-thumb:hover {
+  background: #f5c518;
+}
+
+.commenter-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comment-date-tag {
+  font-size: 0.78rem;
+  color: #777;
+}
+
+@media (max-width: 800px) {
+  .wide-inputs-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .user-input-col,
+  .text-input-col {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .submit-comment-btn-inline {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .detail-page-wrapper {
   min-height: 100vh;
   padding: 30px 20px 0 20px;
@@ -642,4 +787,138 @@
   .similar-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+/* Başlık Grubu */
+.section-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.section-header-title h2 {
+  font-size: 1.6rem;
+  margin: 0;
+  color: #fff;
+}
+
+.cast-module-container {
+  max-width: 1200px;
+  margin: 0 auto 50px auto;
+  text-align: left;
+}
+
+.cast-grid-large {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 20px;
+}
+
+.cast-card-large {
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(24, 24, 24, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.cast-card-large:hover {
+  transform: translateY(-8px);
+  border-color: rgba(245, 197, 24, 0.4);
+}
+
+.cast-image-wrap {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: #111;
+}
+
+.cast-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.cast-card-large:hover .cast-image-wrap img {
+  transform: scale(1.06);
+}
+
+.cast-info-large {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.cast-info-large .actor-name {
+  font-size: 1.05rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.cast-info-large .character-name {
+  font-size: 0.85rem;
+  color: #f5c518;
+}
+
+/* AÇILIR/KAPANIR BİLGİ KUTULARI (ACCORDION) */
+.trivia-accordion-section {
+  max-width: 1200px;
+  margin: 50px auto 70px auto;
+  text-align: left;
+}
+
+.accordion-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.accordion-card {
+  background: rgba(24, 24, 24, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+
+.accordion-card.active {
+  border-color: rgba(245, 197, 24, 0.45);
+}
+
+.accordion-header-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  text-align: left;
+}
+
+.acc-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #eee;
+}
+
+.accordion-content {
+  padding: 0 20px 18px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.accordion-content p {
+  color: #bbb;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 12px 0 0 0;
 }

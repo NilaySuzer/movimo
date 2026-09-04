@@ -10,7 +10,11 @@ import {
   Send, 
   X, 
   Tv, 
-  MessageSquare
+  MessageSquare,
+  Users,        
+  ChevronDown,  
+  ChevronUp,    
+  HelpCircle
 } from 'lucide-react';
 import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
@@ -48,7 +52,7 @@ export default function MovieDetail() {
   const [newCommentText, setNewCommentText] = useState('');
   const [newCommentRating, setNewCommentRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
-
+ const [openAccordion, setOpenAccordion] = useState(0);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
@@ -89,7 +93,32 @@ export default function MovieDetail() {
   };
 
   const embedUrl = getYouTubeEmbedUrl(movie.trailerUrl);
+  const castList = movie.cast || [
+    { name: "Christian Bale", role: "Bruce Wayne / Batman", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
+    { name: "Heath Ledger", role: "Joker", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=200&q=80" },
+    { name: "Gary Oldman", role: "Jim Gordon", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80" },
+    { name: "Michael Caine", role: "Alfred Pennyworth", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
+    { name: "Morgan Freeman", role: "Lucius Fox", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=200&q=80" }
+  ];
 
+  const triviaData = [
+    {
+      title: "🎬 Çekim Anekdotları & Kamera Arkası",
+      content: `${movie.title} çekimlerinde pratik efektler ve IMAX kameraları yoğun olarak kullanıldı. Yönetmen ve yapım ekibi CGI yerine gerçek mekan patlamaları ve fiziksel setler inşa etmeyi tercih etti.`
+    },
+    {
+      title: "🏆 Gişe ve Ödül Başarıları",
+      content: `Film dünya genelinde büyük bir gişe başarısına imza atarak hem eleştirmenlerden tam not aldı hem de yılın en çok konuşulan sinema olaylarından biri haline geldi.`
+    },
+    {
+      title: "🎵 Müzikler ve Ses Tasarımı",
+      content: `Filmin orijinal müzikleri sinematik tansiyonu her saniye yüksek tutacak biçimde akustik ve elektronik tınıların harmanlanmasıyla bestelendi.`
+    },
+    {
+      title: "💡 Yönetmenin Vizyonu ve Tematik Derinlik",
+      content: `Eserde işlenen kaos, adalet ve fedakarlık temaları; klasik tür kalıplarını aşarak modern bir sinema dili oluşturuyor.`
+    }
+  ];
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     if (!newCommentName.trim() || !newCommentText.trim()) return;
@@ -232,94 +261,119 @@ export default function MovieDetail() {
         </div>
       )}
 
-      {/* YORUMLAR BÖLÜMÜ */}
-      <section id="comment-section" className="comments-module-container">
-        <div className="comments-header">
-          <h2>💬 Kullanıcı İncelemeleri ({allComments.length})</h2>
+      <section className="cast-module-container">
+        <div className="section-header-title">
+          <Users size={24} color="#f5c518" />
+          <h2>Başrol Oyuncuları & Karakterler</h2>
         </div>
-
-        <div className="comments-dual-grid">
-          {/* YORUM YAZMA FORMU */}
-          <div className="comment-form-card glass-panel">
-            <h3>Bu Filmi Puanla & Yorumla</h3>
-            <form onSubmit={handleCommentSubmit}>
-              <div className="form-group">
-                <label>Kullanıcı Adınız:</label>
-                <input
-                  type="text"
-                  placeholder="Örn: Nilay"
-                  value={newCommentName}
-                  onChange={(e) => setNewCommentName(e.target.value)}
-                  required
-                />
+        <div className="cast-grid-large">
+          {castList.map((actor, idx) => (
+            <div key={idx} className="cast-card-large glass-panel">
+              <div className="cast-image-wrap">
+                <img src={actor.avatar} alt={actor.name} />
               </div>
-
-              <div className="form-group">
-                <label>Puanınız:</label>
-                <div className="rating-select-stars">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={22}
-                      className="star-selectable"
-                      color={(hoverRating || newCommentRating) >= star ? '#f5c518' : '#555'}
-                      fill={(hoverRating || newCommentRating) >= star ? '#f5c518' : 'none'}
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setNewCommentRating(star)}
-                    />
-                  ))}
-                  <span className="rating-indicator">{hoverRating || newCommentRating} / 5</span>
-                </div>
+              <div className="cast-info-large">
+                <strong className="actor-name">{actor.name}</strong>
+                <span className="character-name">{actor.role}</span>
               </div>
-
-              <div className="form-group">
-                <label>İncelemeniz:</label>
-                <textarea
-                  rows="4"
-                  placeholder="Film hakkındaki düşünceleriniz, yönetmenlik, oyunculuklar..."
-                  value={newCommentText}
-                  onChange={(e) => setNewCommentText(e.target.value)}
-                  required
-                ></textarea>
-              </div>
-
-              <button type="submit" className="submit-comment-btn" style={{ backgroundColor: themeColor }}>
-                <Send size={16} />
-                <span>İncelemeyi Yayınla</span>
-              </button>
-            </form>
-          </div>
-
-          {/* YORUMLARIN LİSTESİ */}
-          <div className="comments-list-feed">
-            {allComments.length > 0 ? (
-              allComments.map((c, index) => (
-                <div key={index} className="single-comment-card glass-panel">
-                  <div className="comment-card-top">
-                    <strong className="commenter-name" style={{ color: themeColor }}>
-                      {c.user}
-                    </strong>
-                    {c.rating && (
-                      <div className="comment-stars">
-                        {Array.from({ length: c.rating }).map((_, i) => (
-                          <Star key={i} size={14} fill="#f5c518" color="#f5c518" />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <p className="commenter-text">{c.text}</p>
-                </div>
-              ))
-            ) : (
-              <div className="no-comments-box glass-panel">
-                <MessageSquare size={36} color="#666" />
-                <p>Henüz yorum yapılmamış. İlk incelemeyi sen yaz!</p>
-              </div>
-            )}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
+
+       {/* 2. ENİNE YORUM FORMU & SCROLL EDİLEBİLİR YORUM LİSTESİ */}
+           <section id="comment-section" className="comments-module-container">
+             <div className="comments-header">
+               <h2>💬 Kullanıcı İncelemeleri ({allComments.length})</h2>
+               <span className="scroll-hint-pill">Aşağı kaydırarak tüm incelemeleri inceleyebilirsiniz</span>
+             </div>
+     
+             {/* ENİNE / TAM GENİŞLİK YORUM YAZMA ALANI */}
+             <div className="comment-form-wide glass-panel">
+               <div className="form-header-line">
+                 <h3>Bu Filme Puan Ver & İnceleme Paylaş</h3>
+                 
+                 {/* Yıldız Seçimi */}
+                 <div className="rating-select-stars">
+                   {[1, 2, 3, 4, 5].map((star) => (
+                     <Star
+                       key={star}
+                       size={24}
+                       className="star-selectable"
+                       color={(hoverRating || newCommentRating) >= star ? '#f5c518' : '#555'}
+                       fill={(hoverRating || newCommentRating) >= star ? '#f5c518' : 'none'}
+                       onMouseEnter={() => setHoverRating(star)}
+                       onMouseLeave={() => setHoverRating(0)}
+                       onClick={() => setNewCommentRating(star)}
+                     />
+                   ))}
+                   <span className="rating-indicator">{hoverRating || newCommentRating} / 5</span>
+                 </div>
+               </div>
+     
+               <form onSubmit={handleCommentSubmit} className="wide-comment-form">
+                 <div className="wide-inputs-row">
+                   <div className="form-group user-input-col">
+                     <label>Kullanıcı Adınız:</label>
+                     <input
+                       type="text"
+                       placeholder="Örn: Nilay"
+                       value={newCommentName}
+                       onChange={(e) => setNewCommentName(e.target.value)}
+                       required
+                     />
+                   </div>
+     
+                   <div className="form-group text-input-col">
+                     <label>İncelemeniz:</label>
+                     <textarea
+                       rows="2"
+                       placeholder="Film hakkındaki düşünceleriniz, yönetmenlik, sinematografi..."
+                       value={newCommentText}
+                       onChange={(e) => setNewCommentText(e.target.value)}
+                       required
+                     ></textarea>
+                   </div>
+     
+                   <button type="submit" className="submit-comment-btn-inline" style={{ backgroundColor: themeColor }}>
+                     <Send size={16} />
+                     <span>Yayınla</span>
+                   </button>
+                 </div>
+               </form>
+             </div>
+     
+             {/* SINIRLI YÜKSEKLİKTE İÇTEN SCROLL EDİLEBİLİR YORUM LİSTESİ */}
+             <div className="comments-scroll-feed">
+               {allComments.length > 0 ? (
+                 allComments.map((c, index) => (
+                   <div key={index} className="single-comment-card glass-panel">
+                     <div className="comment-card-top">
+                       <div className="commenter-meta">
+                         <strong className="commenter-name" style={{ color: themeColor }}>
+                           {c.user}
+                         </strong>
+                         <span className="comment-date-tag">{c.date || 'Az önce'}</span>
+                       </div>
+                       {c.rating && (
+                         <div className="comment-stars">
+                           {Array.from({ length: c.rating }).map((_, i) => (
+                             <Star key={i} size={14} fill="#f5c518" color="#f5c518" />
+                           ))}
+                         </div>
+                       )}
+                     </div>
+                     <p className="commenter-text">{c.text}</p>
+                   </div>
+                 ))
+               ) : (
+                 <div className="no-comments-box glass-panel">
+                   <MessageSquare size={36} color="#666" />
+                   <p>Henüz inceleme yazılmamış. İlk değerlendirmeyi yukarıdan sen yap!</p>
+                 </div>
+               )}
+             </div>
+           </section>
 
       {/* BENZER FİLMLER */}
       {similarMovies.length > 0 && (
@@ -340,6 +394,34 @@ export default function MovieDetail() {
           </div>
         </section>
       )}
+       <section className="trivia-accordion-section">
+              <div className="section-header-title">
+                <HelpCircle size={22} color="#f5c518" />
+                <h2>Film Hakkında Bilinmeyenler & Notlar</h2>
+              </div>
+              <div className="accordion-wrapper">
+                {triviaData.map((item, idx) => {
+                  const isOpen = openAccordion === idx;
+                  return (
+                    <div key={idx} className={`accordion-card glass-panel ${isOpen ? 'active' : ''}`}>
+                      <button 
+                        type="button" 
+                        className="accordion-header-btn" 
+                        onClick={() => setOpenAccordion(isOpen ? null : idx)}
+                      >
+                        <span className="acc-title">{item.title}</span>
+                        {isOpen ? <ChevronUp size={18} color="#f5c518" /> : <ChevronDown size={18} color="#aaa" />}
+                      </button>
+                      {isOpen && (
+                        <div className="accordion-content">
+                          <p>{item.content}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
     </div>
   );
 }
