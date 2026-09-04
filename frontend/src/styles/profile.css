@@ -465,3 +465,156 @@
 .stat-box.clickable-stat:hover .stat-lbl {
   color: #f5c518;
 }
+/* TOPLULUK KEŞFİ BÖLÜMÜ */
+.community-discovery-section {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding: 25px 30px;
+  border-radius: 16px;
+  background: rgba(24, 24, 24, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: left;
+}
+
+.discovery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 15px;
+}
+
+.disc-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.disc-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.user-search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 6px 14px;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.user-search-bar input {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 0.88rem;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+}
+
+.clear-search {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.discovery-users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.suggested-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+
+.suggested-user-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(245, 197, 24, 0.3);
+}
+
+.sugg-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  flex-shrink: 0;
+}
+
+.sugg-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sugg-name {
+  display: block;
+  font-size: 0.95rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sugg-handle {
+  display: block;
+  font-size: 0.78rem;
+  color: #f5c518;
+}
+
+.sugg-bio {
+  margin: 3px 0 0 0;
+  font-size: 0.75rem;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sugg-follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: #f5c518;
+  color: #000;
+  border: none;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.sugg-follow-btn:hover {
+  background: #b20710;
+  color: #fff;
+}
+
+.sugg-follow-btn.following {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}

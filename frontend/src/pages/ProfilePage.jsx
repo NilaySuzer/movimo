@@ -10,11 +10,15 @@ import {
   Trash2, 
   Calendar,
   Share,
-  Share2
+  Share2,
+  Search,       
+  UserPlus,    
+  UserCheck, Sparkles    
 } from 'lucide-react';
 import QuickReviewModal from '../components/QuickReviewModal';
 import { useMovies } from '../context/MovieContext';
 import { movies } from '../data/moviesData';
+import { communityUsers } from '../data/usersData'; 
 import EditProfileModal from '../components/EditProfileModal';
 import FollowModal from '../components/FollowModal';
 import '../styles/profile.css';
@@ -57,6 +61,18 @@ const openFollowModal = (tabName) => {
   // Slug dizilerini gerçek film objeleriyle eşleştiriyoruz
   const watchlistMovies = movies.filter(m => watchlist.includes(m.slug));
   const likedMoviesList = movies.filter(m => likedMovies.includes(m.slug));
+
+   const [userSearchQuery, setUserSearchQuery] = useState('');
+
+  // Arama filtresine uyan veya takip edilmeyen önerilen kullanıcılar
+  const filteredUsers = communityUsers.filter(u => {
+    const matchesSearch = u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+      u.username.toLowerCase().includes(userSearchQuery.toLowerCase());
+    return matchesSearch;
+  });
+
+  // Takip önerileri (Henüz takip edilmeyenler)
+  const suggestedUsers = communityUsers.filter(u => !followingList.includes(u.username)).slice(0, 3);
 
   const handleDeleteReview = (id) => {
     if (window.confirm("Bu incelemeyi silmek istediğinize emin misiniz?")) {
@@ -150,6 +166,55 @@ const openFollowModal = (tabName) => {
         </div>
             </div>
           </div>
+           {/* 5. TOPLULUK KEŞFİ: KULLANICI ARAMA & TAKİP ÖNERİLERİ */}
+        <section className="community-discovery-section glass-panel">
+          <div className="discovery-header">
+            <div className="disc-title">
+              <Sparkles size={20} color="#f5c518" />
+              <h3>Sinemasever Topluluğu Keşfet</h3>
+            </div>
+
+            {/* Arama Çubuğu */}
+            <div className="user-search-bar">
+              <Search size={16} color="#888" />
+              <input 
+                type="text" 
+                placeholder="Kullanıcı veya eleştirmen ara..." 
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+              />
+              {userSearchQuery && (
+                <button className="clear-search" onClick={() => setUserSearchQuery('')}>×</button>
+              )}
+            </div>
+          </div>
+
+          {/* Eğer arama yapılıyorsa sonuçları, yapılmıyorsa takip önerilerini göster */}
+          <div className="discovery-users-grid">
+            {(userSearchQuery ? filteredUsers : suggestedUsers).map((u) => {
+              const isFollowed = followingList.includes(u.username);
+              return (
+                <div key={u.id} className="suggested-user-card glass-panel">
+                  <img src={u.avatar} alt={u.name} className="sugg-avatar" />
+                  <div className="sugg-info">
+                    <strong className="sugg-name">{u.name}</strong>
+                    <span className="sugg-handle">{u.username}</span>
+                    <p className="sugg-bio">{u.bio}</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    className={`sugg-follow-btn ${isFollowed ? 'following' : ''}`}
+                    onClick={() => toggleFollow(u.username)}
+                  >
+                    {isFollowed ? <UserCheck size={14} /> : <UserPlus size={14} />}
+                    <span>{isFollowed ? 'Takiptesin' : 'Takip Et'}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         </div>
 
         {/* 3. PINNED FAVORITES */}
@@ -307,6 +372,8 @@ const openFollowModal = (tabName) => {
           )}
         </div>
       </div>
+
+     
 
       {/* EDIT PROFILE MODAL */}
       <EditProfileModal 
