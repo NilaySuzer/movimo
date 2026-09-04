@@ -739,3 +739,147 @@
     bottom: 15px;
   }
 }
+
+.view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(24, 24, 28, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ddd;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.view-all-btn .view-all-icon {
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
+  color: #aaa;
+}
+
+/* Hover Efekti */
+.view-all-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-color, #f5c518);
+  color: #fff;
+  transform: translateX(3px);
+  box-shadow: 0 0 15px rgba(245, 197, 24, 0.15);
+}
+
+.view-all-btn:hover .view-all-icon {
+  transform: translateX(4px);
+  color: var(--accent-color, #f5c518);
+}
+
+/* Mobilde Uyumlu Görünüm */
+@media (max-width: 600px) {
+  .title-left h2 {
+    font-size: 1.25rem;
+  }
+
+  .view-all-btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    gap: 5px;
+  }
+}
+/* Başlık Satırı: Tüm genişliği kaplar ve iki uca yaslar */
+.category-header-row {
+  width: 100% !important;
+  max-width: 1200px; /* Sayfanın ana grid genişliği neyse aynısı olsun */
+  margin: 40px auto 20px auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important; /* Biri en sola, biri en sağa */
+  align-items: center !important; /* Dikeyde tam ortalı aynı hizada */
+}
+
+/* Sol Taraf: Nokta + Başlık yan yana */
+.category-title-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.category-accent-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.category-title-left h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1; /* Satır boşluğunu sıfırlayıp butonla aynı hizaya kilitler */
+}
+
+/* Sağ Taraf: Tümünü Gör Butonu */
+.view-all-btn {
+  margin-left: auto; /* İkinci bir garanti: Kalan tüm boşluğu sola iter, butonu en sağa kilitler */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: rgba(24, 24, 28, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ddd;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap; /* Mobilde veya dar ekranda iki satıra bölünmez */
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.view-all-btn .view-all-icon {
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
+  color: #aaa;
+}
+
+.view-all-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-color, #f5c518);
+  color: #fff;
+  transform: translateX(3px);
+  box-shadow: 0 0 15px rgba(245, 197, 24, 0.2);
+}
+
+.view-all-btn:hover .view-all-icon {
+  transform: translateX(4px);
+  color: var(--accent-color, #f5c518);
+}
+
+/* Mobilde Uyum */
+@media (max-width: 600px) {
+  .category-title-left h2 {
+    font-size: 1.25rem;
+  }
+  .view-all-btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+}

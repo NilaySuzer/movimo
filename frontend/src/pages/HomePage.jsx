@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { movies, comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import '../styles/home.css';
+import { ArrowRight } from 'lucide-react';
 
 // 1. Hero Slider Verileri
 const featuredSlides = [
@@ -184,7 +185,26 @@ export default function HomePage() {
             const categoryMovies = movies.filter((m) => m.category === cat.id);
             return (
               <section id={cat.id} key={cat.id} className="category-section">
-                <h2 className={`category-title ${cat.className}`}>{cat.name}</h2>
+                {/* KATEGORİ BAŞLIK SATIRI (Garantili Sağa Yaslama) */}
+<div className="category-header-row">
+  <div className="category-title-left">
+    <span 
+      className="category-accent-dot" 
+      style={{ backgroundColor: cat.color || '#f5c518' }}
+    ></span>
+    <h2 id={cat.id}>{cat.name}</h2>
+  </div>
+
+  {/* EN SAĞA YASLI BUTON */}
+  <Link 
+    to={`/category/${cat.id}`} 
+    className="view-all-btn glass-panel"
+    style={{ '--accent-color': cat.color || '#f5c518' }}
+  >
+    <span>Tümünü Gör</span>
+    <ArrowRight size={15} className="view-all-icon" />
+  </Link>
+</div>
                 <div className="card-container">
                   {categoryMovies.map((movie) => (
                     <div className="card" key={movie.slug}>

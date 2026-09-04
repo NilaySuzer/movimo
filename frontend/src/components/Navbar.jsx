@@ -15,6 +15,7 @@ import {
   Mail, 
   Bell, 
   PlusCircle, 
+  Sparkles,
   Sun, 
   Moon, 
   Smile, 
@@ -188,28 +189,32 @@ export default function Navbar() {
                       
             {/* 1. CATEGORIES (TIKLAMAYLA AÇILIR) */}
             <li className="nav-item dropdown">
-              <button 
-                type="button"
-                className={`nav-links-btn ${activeDropdown === 'categories' ? 'active-link' : ''}`}
-                onClick={() => toggleDropdown('categories')}
-              >
-                <span>{lang === 'TR' ? 'Kategoriler' : 'Categories'}</span>
-                <ChevronDown size={14} className={`dropdown-arrow ${activeDropdown === 'categories' ? 'rotated' : ''}`} />
-              </button>
+  <button 
+    type="button" 
+    className={`nav-links-btn ${activeDropdown === 'categories' ? 'active-link' : ''}`}
+    onClick={() => toggleDropdown('categories')}
+  >
+    <span>{lang === 'TR' ? 'Kategoriler' : 'Categories'}</span>
+    <ChevronDown size={14} className={`dropdown-arrow ${activeDropdown === 'categories' ? 'rotated' : ''}`} />
+  </button>
 
-              {activeDropdown === 'categories' && (
-                <ul className="dropdown-menu glass-panel">
-                  {categories.map((cat) => (
-                    <li key={cat.id}>
-                      <a href={`/#${cat.id}`} className="dropdown-link" onClick={closeAll}>
-                        <span className="cat-dot" style={{ backgroundColor: cat.color }}></span>
-                        {cat.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+  {activeDropdown === 'categories' && (
+    <ul className="dropdown-menu glass-panel">
+      {categories.map((cat) => (
+        <li key={cat.id}>
+          <Link 
+            to={`/category/${cat.id}`} 
+            className="dropdown-link" 
+            onClick={closeAll}
+          >
+            <span className="cat-dot" style={{ backgroundColor: cat.color }}></span>
+            {cat.name}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  )}
+</li>
 
             {/* 2. MOODS (TIKLAMAYLA AÇILIR) */}
             <li className="nav-item dropdown">
@@ -223,17 +228,21 @@ export default function Navbar() {
                 <ChevronDown size={14} className={`dropdown-arrow ${activeDropdown === 'moods' ? 'rotated' : ''}`} />
               </button>
 
-              {activeDropdown === 'moods' && (
-                <ul className="dropdown-menu glass-panel mood-menu">
-                  {moodList.map((m) => (
-                    <li key={m.id}>
-                      <button className="dropdown-link mood-btn" onClick={() => handleMoodSelect(m.filter)}>
-                        {lang === 'TR' ? m.labelTr : m.label}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+             {activeDropdown === 'moods' && (
+  <ul className="dropdown-menu glass-panel mood-menu">
+    {moodList.map((m) => (
+      <li key={m.id}>
+        <Link 
+          to={`/mood/${m.id}`} 
+          className="dropdown-link mood-btn" 
+          onClick={closeAll}
+        >
+          {lang === 'TR' ? m.labelTr : m.label}
+        </Link>
+      </li>
+    ))}
+  </ul>
+)}
             </li>
 
             {/* 4. SURPRISE ME */}

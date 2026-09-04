@@ -1,0 +1,121 @@
+.category-page-wrapper {
+  min-height: 100vh;
+  padding: 30px 20px 0 20px;
+  color: #eee;
+}
+
+.category-top-bar {
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+  display: flex;
+}
+
+.category-header {
+  max-width: 900px;
+  margin: 0 auto 40px auto;
+  text-align: center;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.category-header h1 {
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+  color: #fff;
+}
+
+.category-header p {
+  color: #aaa;
+  font-size: 1.05rem;
+}
+
+.category-movies-grid {
+  max-width: 1200px;
+  margin: 0 auto 60px auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.cat-movie-card {
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.cat-movie-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(245, 197, 24, 0.4);
+}
+
+.card-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 290px;
+}
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rating-pill {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-meta {
+  padding: 12px;
+  text-align: left;
+}
+
+.card-meta h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.genre-tag {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.empty-category {
+  grid-column: 1 / -1;
+  padding: 50px 20px;
+  text-align: center;
+  color: #777;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
