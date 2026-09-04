@@ -26,7 +26,45 @@ export const movies = [
       { user: "Hailey E.", text: "Guys, stop givin spoieess!!!" },
       { user: "Skylerr", text: "Switching to Gotham🚗🚗🚗🚗" },
       { user: "spongebobsquarepants", text: "2000's... You know the 2000's Patrick?" }
-    ]
+    ],
+    cast: [
+    { 
+      name: "Christian Bale", 
+      role: "Bruce Wayne / Batman", 
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" 
+    },
+    { 
+      name: "Heath Ledger", 
+      role: "Joker", 
+      avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&q=80" 
+    },
+    { 
+      name: "Gary Oldman", 
+      role: "Jim Gordon", 
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80" 
+    },
+    { 
+      name: "Michael Caine", 
+      role: "Alfred", 
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" 
+    }
+  ],
+
+  // 2. AÇILIR KAPANIR BİLGİ KUTULARI (trivia / faq)
+  trivia: [
+    {
+      title: "🃏 Heath Ledger'ın Hazırlık Süreci",
+      content: "Heath Ledger, Joker rolüne hazırlanmak için yaklaşık altı hafta boyunca bir otel odasına kapandı, karakterin günlüğünü tuttu ve ses tonu üzerinde çalıştı."
+    },
+    {
+      title: "💥 Gerçek Hastane Patlaması",
+      content: "Filmdeki hastane patlama sahnesi tamamen pratik efektlerle ve gerçek bir binanın kontrollü olarak patlatılmasıyla çekildi; CGI kullanılmadı."
+    },
+    {
+      title: "🎥 IMAX Kameraları",
+      content: "The Dark Knight, önemli aksiyon sekanslarında geleneksel 35mm kameralar yerine devasa 70mm IMAX kameraları kullanan ilk büyük Hollywood yapımıdır."
+    }
+  ]
   },
   {
     slug: 'fast-and-furious',

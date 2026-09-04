@@ -44,7 +44,14 @@ export default function MovieDetail() {
   // Doğrudan Context üzerinden aktif durumu okuyoruz
   const isLiked = isMovieLiked(slug);
   const inWatchlist = isInWatchlist(slug);
-
+  const triviaData = movie.trivia || [
+  // Filmde özel trivia yoksa çalışan genel varsayılanlar
+  {
+    title: "🎬 Çekim Anekdotları & Kamera Arkası",
+    content: `${movie.title} çekimlerinde pratik efektler ve özel teknikler yoğun olarak kullanıldı.`
+  },
+  // ...
+];
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
 
   // Yorum Formu State'leri
@@ -101,24 +108,7 @@ export default function MovieDetail() {
     { name: "Morgan Freeman", role: "Lucius Fox", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=200&q=80" }
   ];
 
-  const triviaData = [
-    {
-      title: "🎬 Çekim Anekdotları & Kamera Arkası",
-      content: `${movie.title} çekimlerinde pratik efektler ve IMAX kameraları yoğun olarak kullanıldı. Yönetmen ve yapım ekibi CGI yerine gerçek mekan patlamaları ve fiziksel setler inşa etmeyi tercih etti.`
-    },
-    {
-      title: "🏆 Gişe ve Ödül Başarıları",
-      content: `Film dünya genelinde büyük bir gişe başarısına imza atarak hem eleştirmenlerden tam not aldı hem de yılın en çok konuşulan sinema olaylarından biri haline geldi.`
-    },
-    {
-      title: "🎵 Müzikler ve Ses Tasarımı",
-      content: `Filmin orijinal müzikleri sinematik tansiyonu her saniye yüksek tutacak biçimde akustik ve elektronik tınıların harmanlanmasıyla bestelendi.`
-    },
-    {
-      title: "💡 Yönetmenin Vizyonu ve Tematik Derinlik",
-      content: `Eserde işlenen kaos, adalet ve fedakarlık temaları; klasik tür kalıplarını aşarak modern bir sinema dili oluşturuyor.`
-    }
-  ];
+  
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     if (!newCommentName.trim() || !newCommentText.trim()) return;
