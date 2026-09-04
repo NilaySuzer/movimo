@@ -20,6 +20,7 @@ import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import { useMovies } from '../context/MovieContext';
 import '../styles/detail.css';
+import { useToast } from '../context/ToastContext';
 
 export default function MovieDetail() {
   const { slug } = useParams();
@@ -40,7 +41,7 @@ export default function MovieDetail() {
     color: '#f5c518',
     name: 'Featured'
   };
-
+const { showToast } = useToast();
   // Doğrudan Context üzerinden aktif durumu okuyoruz
   const isLiked = isMovieLiked(slug);
   const inWatchlist = isInWatchlist(slug);
@@ -126,11 +127,12 @@ export default function MovieDetail() {
     setNewCommentName('');
     setNewCommentText('');
     setNewCommentRating(5);
+    showToast('Yorumunuz başarıyla eklendi!', 'success');
   };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Film bağlantısı panoya kopyalandı! 🔗');
+    showToast('Film bağlantısı panoya kopyalandı! 🔗', 'success');
   };
 
   const similarMovies = movies
@@ -153,7 +155,9 @@ export default function MovieDetail() {
           {/* Beğen Butonu (Context Toggle) */}
           <button 
             className={`action-circle-btn ${isLiked ? 'liked' : ''}`}
-            onClick={() => toggleLike(slug)}
+            onClick={() => {toggleLike(slug);
+  showToast(isLiked ? 'Beğeniyi kaldırdınız. 💔' : 'Film beğenildi! ❤️', isLiked ? 'info' : 'success');
+}}
             title={isLiked ? "Beğeniyi Kaldır" : "Beğen"}
           >
             <Heart size={18} fill={isLiked ? "#ff4757" : "none"} color={isLiked ? "#ff4757" : "#fff"} />
@@ -162,8 +166,9 @@ export default function MovieDetail() {
           {/* Watchlist Butonu (Context Toggle) */}
           <button 
             className={`action-circle-btn ${inWatchlist ? 'saved' : ''}`}
-            onClick={() => toggleWatchlist(slug)}
-            title={inWatchlist ? "Listemden Çıkar" : "İzleme Listeme Ekle"}
+            onClick={() => {toggleWatchlist(slug);
+  showToast(inWatchlist ? 'İzleme listesinden çıkarıldı.' : 'İzleme listesine eklendi!🍿', inWatchlist ? 'info' : 'success');
+}}
           >
             <Bookmark size={18} fill={inWatchlist ? "#f5c518" : "none"} color={inWatchlist ? "#f5c518" : "#fff"} />
           </button>
@@ -171,7 +176,9 @@ export default function MovieDetail() {
           {/* Paylaş Butonu */}
           <button 
             className="action-circle-btn" 
-            onClick={handleShare}
+            onClick={() => {
+              handleShare();
+            }}
             title="Filmi Paylaş"
           >
             <Share2 size={18} />
