@@ -922,3 +922,282 @@
   font-size: 0.95rem;
   margin: 12px 0 0 0;
 }
+/* ================= SPOILER FORMU ALANI ================= */
+.form-bottom-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.spoiler-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.spoiler-toggle-label:hover {
+  opacity: 0.9;
+}
+
+.spoiler-toggle-label input[type="checkbox"] {
+  accent-color: #ff4757;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ================= SPOILER ETİKETİ (ROZET) ================= */
+.spoiler-tag-badge {
+  background: rgba(255, 71, 87, 0.15);
+  border: 1px solid rgba(255, 71, 87, 0.45);
+  color: #ff4757;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ================= SPOILER BULANIKLAŞTIRMA (BLUR) ================= */
+.comment-text-wrapper {
+  position: relative;
+  min-height: 48px;
+  margin: 10px 0 14px 0;
+}
+
+/* Spoiler içeren metni kilitler ve okunamayacak seviyede flulaştırır */
+.commenter-text.spoiler-blurred {
+  filter: blur(8px);
+  user-select: none; /* Metnin kopyalanarak okunmasını engeller */
+  -webkit-user-select: none;
+  pointer-events: none;
+  transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+/* Fluluğun ortasında beliren cam efektli "Spoiler'ı Göster" butonu */
+.reveal-spoiler-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(18, 18, 24, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 197, 24, 0.5);
+  color: #f5c518;
+  padding: 7px 18px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.7),
+    0 0 10px rgba(245, 197, 24, 0.2);
+  transition: all 0.25s ease;
+  z-index: 2;
+}
+
+.reveal-spoiler-btn:hover {
+  background: #f5c518;
+  color: #000;
+  box-shadow: 0 0 15px rgba(245, 197, 24, 0.5);
+  transform: translate(-50%, -50%) scale(1.04);
+}
+
+/* Tekrar Gizle Butonu */
+.hide-spoiler-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-top: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.hide-spoiler-btn:hover {
+  color: #ff4757;
+}
+
+/* ================= UPVOTE (FAYDALI BULDUM) BUTONU ================= */
+.comment-footer-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.upvote-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #aaa;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upvote-btn:hover {
+  border-color: #f5c518;
+  color: #fff;
+  background: rgba(245, 197, 24, 0.12);
+  transform: translateY(-1px);
+}
+
+.upvote-btn:active {
+  transform: scale(0.96);
+}
+/* ================= TOPLULUK PUAN DAĞILIMI (HISTOGRAM) ================= */
+.community-rating-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 24px 30px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+/* Sol Alan: Büyük Puan Göstergesi */
+.community-rating-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.community-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+}
+
+.score-big-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.score-number {
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  font-family: monospace, sans-serif;
+}
+
+.score-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stars-row {
+  display: flex;
+  gap: 3px;
+}
+
+.total-votes-count {
+  font-size: 0.82rem;
+  color: #aaa;
+}
+
+/* Sağ Alan: Çubuk Grafik (Histogram) */
+.community-histogram {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.histogram-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.star-level {
+  width: 32px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f5c518;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.histogram-track {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.histogram-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 0;
+}
+
+.histogram-percent {
+  width: 42px;
+  font-size: 0.8rem;
+  color: #888;
+  font-family: monospace;
+  text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .community-rating-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 25px;
+    padding: 20px;
+  }
+
+  .community-histogram {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+.commenter-text.spoiler-blurred {
+  filter: blur(8px) !important;
+  user-select: none !important;
+  opacity: 0.5;
+}

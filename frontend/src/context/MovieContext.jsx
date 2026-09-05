@@ -172,14 +172,17 @@ export function MovieProvider({ children }) {
     );
   };
 
-  const addReview = (reviewData) => {
-    const newEntry = {
-      id: Date.now(),
-      date: 'Az önce',
-      ...reviewData
-    };
-    setUserReviews((prev) => [newEntry, ...prev]);
-  };
+ const addReview = (reviewData) => {
+  const newReview = {
+    id: Date.now(),
+    ...reviewData, // 👈 Gönderdiğin her şeyi (isSpoiler dahil) doğrudan alır
+    isSpoiler: Boolean(reviewData.isSpoiler), // 👈 Açıkça true/false olarak kilitler
+    text: reviewData.comment || reviewData.text,
+    upvotes: 0
+   };
+   
+  setUserReviews((prev) => [newReview, ...prev]);
+};
 
   const deleteReview = (id) => {
     setUserReviews((prev) => prev.filter((r) => r.id !== id));

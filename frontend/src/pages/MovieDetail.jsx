@@ -14,7 +14,7 @@ import {
   Users,        
   ChevronDown,  
   ChevronUp,    
-  HelpCircle
+  HelpCircle, Eye, EyeOff, ThumbsUp, BarChart2, ShieldAlert
 } from 'lucide-react';
 import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
@@ -25,6 +25,9 @@ import { useToast } from '../context/ToastContext';
 export default function MovieDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
+ const [isSpoiler, setIsSpoiler] = useState(false);
+  const [unblurredComments, setUnblurredComments] = useState({});
+  const [commentVotes, setCommentVotes] = useState({});
 
   // Context'ten dinamik fonksiyon ve durumları alıyoruz
   const { 
@@ -35,6 +38,17 @@ export default function MovieDetail() {
     addReview,
     userReviews 
   } = useMovies();
+ const toggleSpoilerBlur = (idx) => {
+    setUnblurredComments(prev => ({ ...prev, [idx]: !prev[idx] }));
+  };
+
+  const handleVote = (idx) => {
+    setCommentVotes(prev => {
+      const current = prev[idx] || 0;
+      return { ...prev, [idx]: current + 1 };
+    });
+    showToast('İnceleme faydalı bulundu olarak işaretlendi 👍', 'info');
+  };
 
   const movie = movies.find((m) => m.slug === slug);
   const categoryInfo = categories.find((c) => c.id === movie?.category) || {
@@ -83,7 +97,9 @@ const { showToast } = useToast();
       user: r.user || 'Sen (İncelemen)',
       text: r.comment || r.text,
       rating: r.rating,
-      date: r.date || 'Az önce'
+      date: r.date || 'Az önce',
+      isSpoiler: Boolean(r.isSpoiler), // 👈 İŞTE EKSİK OLAN SATIR!
+      upvotes: r.upvotes || 0
     }));
 
   const allComments = [...movieContextReviews, ...(movie.comments || [])];
@@ -109,27 +125,43 @@ const { showToast } = useToast();
     { name: "Morgan Freeman", role: "Lucius Fox", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=200&q=80" }
   ];
 
+  // Mevcut allComments dizisinden dinamik puan dağılımı çıkarımı
+const totalRatedComments = allComments.filter((c) => c.rating).length;
+
+const ratingDistribution = [5, 4, 3, 2, 1].map((star) => {
+  const count = allComments.filter((c) => Number(c.rating) === star).length;
+  const percentage = totalRatedComments > 0 ? Math.round((count / totalRatedComments) * 100) : 0;
+  return { stars: star, count, percentage };
+});
+
+const averageCommunityScore = totalRatedComments > 0
+  ? (allComments.reduce((acc, c) => acc + (Number(c.rating) || 0), 0) / totalRatedComments).toFixed(1)
+  : movie.imdb || '0.0';
   
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (!newCommentName.trim() || !newCommentText.trim()) return;
+const handleCommentSubmit = (e) => {
+  e.preventDefault();
+  if (!newCommentName.trim() || !newCommentText.trim()) return;
 
-    // Context'e ekle (localStorage otomatik tetiklenir)
-    addReview({
-      slug: movie.slug,
-      movieTitle: movie.displayTitle || movie.title,
-      poster: movie.poster,
-      rating: newCommentRating,
-      comment: newCommentText.trim(),
-      user: newCommentName.trim()
-    });
+  addReview({
+    slug: movie.slug,
+    movieTitle: movie.displayTitle || movie.title,
+    poster: movie.poster,
+    rating: newCommentRating,
+    comment: newCommentText.trim(),
+    text: newCommentText.trim(), // Hem text hem comment olarak gönderelim garanti olsun
+    user: newCommentName.trim(),
+    date: 'Az önce',
+    isSpoiler: isSpoiler,
+    upvotes: 0
+  });
 
-    setNewCommentName('');
-    setNewCommentText('');
-    setNewCommentRating(5);
-    showToast('Yorumunuz başarıyla eklendi!', 'success');
-  };
-
+  setNewCommentName('');
+  setNewCommentText('');
+  setNewCommentRating(5);
+  setIsSpoiler(false); // 👈 Formu sıfırla
+  showToast('Yorumunuz başarıyla eklendi!', 'success');
+};
+  
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     showToast('Film bağlantısı panoya kopyalandı! 🔗', 'success');
@@ -277,100 +309,214 @@ const { showToast } = useToast();
           ))}
         </div>
       </section>
+{/* TOPLULUK PUAN DAĞILIMI (HISTOGRAM) */}
+<section className="community-rating-section glass-panel">
+  <div className="community-rating-left">
+    <span className="community-badge">Topluluk Skoru</span>
+    <div className="score-big-wrap">
+      <span className="score-number">{averageCommunityScore}</span>
+      <div className="score-meta">
+        <div className="stars-row">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <Star
+              key={s}
+              size={16}
+              fill={s <= Math.round(Number(averageCommunityScore)) ? '#f5c518' : 'none'}
+              color="#f5c518"
+            />
+          ))}
+        </div>
+        <span className="total-votes-count">{totalRatedComments} değerlendirme</span>
+      </div>
+    </div>
+        </div>
+        
 
+  <div className="community-histogram">
+    {ratingDistribution.map((item) => (
+      <div key={item.stars} className="histogram-bar-row">
+        <span className="star-level">{item.stars} ★</span>
+        <div className="histogram-track" title={`${item.count} oy (${item.percentage}%)`}>
+          <div
+            className="histogram-fill"
+            style={{ width: `${item.percentage}%`, backgroundColor: themeColor || '#f5c518' }}
+          ></div>
+        </div>
+        <span className="histogram-percent">{item.percentage}%</span>
+      </div>
+    ))}
+  </div>
+</section>
        {/* 2. ENİNE YORUM FORMU & SCROLL EDİLEBİLİR YORUM LİSTESİ */}
-           <section id="comment-section" className="comments-module-container">
-             <div className="comments-header">
-               <h2>💬 Kullanıcı İncelemeleri ({allComments.length})</h2>
-               <span className="scroll-hint-pill">Aşağı kaydırarak tüm incelemeleri inceleyebilirsiniz</span>
-             </div>
-     
-             {/* ENİNE / TAM GENİŞLİK YORUM YAZMA ALANI */}
-             <div className="comment-form-wide glass-panel">
-               <div className="form-header-line">
-                 <h3>Bu Filme Puan Ver & İnceleme Paylaş</h3>
-                 
-                 {/* Yıldız Seçimi */}
-                 <div className="rating-select-stars">
-                   {[1, 2, 3, 4, 5].map((star) => (
-                     <Star
-                       key={star}
-                       size={24}
-                       className="star-selectable"
-                       color={(hoverRating || newCommentRating) >= star ? '#f5c518' : '#555'}
-                       fill={(hoverRating || newCommentRating) >= star ? '#f5c518' : 'none'}
-                       onMouseEnter={() => setHoverRating(star)}
-                       onMouseLeave={() => setHoverRating(0)}
-                       onClick={() => setNewCommentRating(star)}
-                     />
-                   ))}
-                   <span className="rating-indicator">{hoverRating || newCommentRating} / 5</span>
-                 </div>
-               </div>
-     
-               <form onSubmit={handleCommentSubmit} className="wide-comment-form">
-                 <div className="wide-inputs-row">
-                   <div className="form-group user-input-col">
-                     <label>Kullanıcı Adınız:</label>
-                     <input
-                       type="text"
-                       placeholder="Örn: Nilay"
-                       value={newCommentName}
-                       onChange={(e) => setNewCommentName(e.target.value)}
-                       required
-                     />
-                   </div>
-     
-                   <div className="form-group text-input-col">
-                     <label>İncelemeniz:</label>
-                     <textarea
-                       rows="2"
-                       placeholder="Film hakkındaki düşünceleriniz, yönetmenlik, sinematografi..."
-                       value={newCommentText}
-                       onChange={(e) => setNewCommentText(e.target.value)}
-                       required
-                     ></textarea>
-                   </div>
-     
-                   <button type="submit" className="submit-comment-btn-inline" style={{ backgroundColor: themeColor }}>
-                     <Send size={16} />
-                     <span>Yayınla</span>
-                   </button>
-                 </div>
-               </form>
-             </div>
-     
-             {/* SINIRLI YÜKSEKLİKTE İÇTEN SCROLL EDİLEBİLİR YORUM LİSTESİ */}
-             <div className="comments-scroll-feed">
-               {allComments.length > 0 ? (
-                 allComments.map((c, index) => (
-                   <div key={index} className="single-comment-card glass-panel">
-                     <div className="comment-card-top">
-                       <div className="commenter-meta">
-                         <strong className="commenter-name" style={{ color: themeColor }}>
-                           {c.user}
-                         </strong>
-                         <span className="comment-date-tag">{c.date || 'Az önce'}</span>
-                       </div>
-                       {c.rating && (
-                         <div className="comment-stars">
-                           {Array.from({ length: c.rating }).map((_, i) => (
-                             <Star key={i} size={14} fill="#f5c518" color="#f5c518" />
-                           ))}
-                         </div>
-                       )}
-                     </div>
-                     <p className="commenter-text">{c.text}</p>
-                   </div>
-                 ))
-               ) : (
-                 <div className="no-comments-box glass-panel">
-                   <MessageSquare size={36} color="#666" />
-                   <p>Henüz inceleme yazılmamış. İlk değerlendirmeyi yukarıdan sen yap!</p>
-                 </div>
-               )}
-             </div>
-           </section>
+<section id="comment-section" className="comments-module-container">
+  <div className="comments-header">
+    <h2>💬 Kullanıcı İncelemeleri ({allComments.length})</h2>
+    <span className="scroll-hint-pill">Aşağı kaydırarak tüm incelemeleri inceleyebilirsiniz</span>
+  </div>
+
+  {/* ENİNE / TAM GENİŞLİK YORUM YAZMA ALANI */}
+  <div className="comment-form-wide glass-panel">
+    <div className="form-header-line">
+      <h3>Bu Filme Puan Ver & İnceleme Paylaş</h3>
+
+      {/* Yıldız Seçimi */}
+      <div className="rating-select-stars">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            size={24}
+            className="star-selectable"
+            color={(hoverRating || newCommentRating) >= star ? '#f5c518' : '#555'}
+            fill={(hoverRating || newCommentRating) >= star ? '#f5c518' : 'none'}
+            onMouseEnter={() => setHoverRating(star)}
+            onMouseLeave={() => setHoverRating(0)}
+            onClick={() => setNewCommentRating(star)}
+          />
+        ))}
+        <span className="rating-indicator">{hoverRating || newCommentRating} / 5</span>
+      </div>
+    </div>
+
+    <form 
+      onSubmit={(e) => {
+        handleCommentSubmit(e);
+      }} 
+      className="wide-comment-form"
+    >
+      <div className="wide-inputs-row">
+        <div className="form-group user-input-col">
+          <label>Kullanıcı Adınız:</label>
+          <input
+            type="text"
+            placeholder="Örn: Nilay"
+            value={newCommentName}
+            onChange={(e) => setNewCommentName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group text-input-col">
+          <label>İncelemeniz:</label>
+          <textarea
+            rows="2"
+            placeholder="Film hakkındaki düşünceleriniz, yönetmenlik, sinematografi..."
+            value={newCommentText}
+            onChange={(e) => setNewCommentText(e.target.value)}
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      {/* Spoiler Toggle & Yayınla Butonu Alt Satırı */}
+      <div className="form-bottom-actions">
+        <label className="spoiler-toggle-label">
+          <input
+            type="checkbox"
+            checked={isSpoiler}
+            onChange={(e) => setIsSpoiler(e.target.checked)}
+          />
+          <ShieldAlert size={16} color={isSpoiler ? "#ff4757" : "#888"} />
+          <span style={{ color: isSpoiler ? "#ff4757" : "#aaa" }}>
+            Bu inceleme sürprizbozan (spoiler) içerir
+          </span>
+        </label>
+
+        <button 
+          type="submit" 
+          className="submit-comment-btn-inline" 
+          style={{ backgroundColor: themeColor }}
+        >
+          <Send size={16} />
+          <span>Yayınla</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {/* SINIRLI YÜKSEKLİKTE İÇTEN SCROLL EDİLEBİLİR YORUM LİSTESİ */}
+  <div className="comments-scroll-feed">
+    {allComments.length > 0 ? (
+      allComments.map((c, index) => {
+        const hasSpoiler = c.isSpoiler;
+        const isRevealed = unblurredComments[index];
+  const commentText = c.text || c.comment;
+        return (
+          <div key={index} className="single-comment-card glass-panel">
+            <div className="comment-card-top">
+              <div className="commenter-meta">
+                <strong className="commenter-name" style={{ color: themeColor }}>
+                  {c.user}
+                </strong>
+                <span className="comment-date-tag">{c.date || 'Az önce'}</span>
+                
+                {/* Spoiler Rozeti */}
+                {hasSpoiler && (
+                  <span className="spoiler-tag-badge">
+                    <ShieldAlert size={12} /> SPOILER
+                  </span>
+                )}
+              </div>
+
+              {c.rating && (
+                <div className="comment-stars">
+                  {Array.from({ length: c.rating }).map((_, i) => (
+                    <Star key={i} size={14} fill="#f5c518" color="#f5c518" />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Yorum Metni + Spoiler Bulanıklık Kontrolü */}
+            <div className="comment-text-wrapper">
+              <p className={`commenter-text ${hasSpoiler && !isRevealed ? 'spoiler-blurred' : ''}`}>
+                {c.text}
+              </p>
+
+              {hasSpoiler && !isRevealed && (
+                <button
+                  type="button"
+                  className="reveal-spoiler-btn"
+                  onClick={() => toggleSpoilerBlur(index)}
+                >
+                  <Eye size={14} />
+                  <span>Spoiler'ı Göster</span>
+                </button>
+              )}
+
+              {hasSpoiler && isRevealed && (
+                <button
+                  type="button"
+                  className="hide-spoiler-btn"
+                  onClick={() => toggleSpoilerBlur(index)}
+                >
+                  <EyeOff size={13} />
+                  <span>Tekrar Gizle</span>
+                </button>
+              )}
+            </div>
+
+            {/* Yorum Altı: Upvote (Faydalı Buldum) Butonu */}
+            <div className="comment-footer-bar">
+              <button
+                type="button"
+                className="upvote-btn"
+                onClick={() => handleVote(index)}
+              >
+                <ThumbsUp size={14} />
+                <span>Faydalı Buldum ({commentVotes[index] || c.upvotes || 0})</span>
+              </button>
+            </div>
+          </div>
+        );
+      })
+    ) : (
+      <div className="no-comments-box glass-panel">
+        <MessageSquare size={36} color="#666" />
+        <p>Henüz inceleme yazılmamış. İlk değerlendirmeyi yukarıdan sen yap!</p>
+      </div>
+    )}
+  </div>
+</section>
 
       {/* BENZER FİLMLER */}
       {similarMovies.length > 0 && (
