@@ -22,6 +22,61 @@ export function MovieProvider({ children }) {
     };
   });
     
+  // Özel kullanıcı listeleri state'i (localStorage destekli)
+const [customLists, setCustomLists] = useState(() => {
+  const saved = localStorage.getItem('cinenest_custom_lists');
+  return saved ? JSON.parse(saved) : [
+    { 
+      id: 'list-1', 
+      title: 'Gece Kuşağı & Zihin Bükücüler', 
+      description: 'Gece yarısı izlenmesi gereken atmosferik yapımlar.',
+      movieSlugs: ['inception', 'fight-club', 'interstellar'] 
+    },
+    { 
+      id: 'list-2', 
+      title: 'Hafta Sonu Neşesi', 
+      description: 'Kafayı dağıtmalık, hafif ve keyifli filmler.',
+      movieSlugs: ['amelie', 'spirited-away'] 
+    }
+  ];
+});
+
+// Yeni liste oluşturma
+const createCustomList = (title, description = '') => {
+  if (!title.trim()) return;
+  const newList = {
+    id: `list-${Date.now()}`,
+    title: title.trim(),
+    description: description.trim(),
+    movieSlugs: []
+  };
+  const updated = [newList, ...customLists];
+  setCustomLists(updated);
+  localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
+};
+
+// Listeyi silme
+const deleteCustomList = (listId) => {
+  const updated = customLists.filter((l) => l.id !== listId);
+  setCustomLists(updated);
+  localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
+};
+
+// Filme göre listeye ekleme / çıkarma
+const toggleMovieInList = (listId, movieSlug) => {
+  const updated = customLists.map((list) => {
+    if (list.id === listId) {
+      const exists = list.movieSlugs.includes(movieSlug);
+      const newSlugs = exists
+        ? list.movieSlugs.filter((s) => s !== movieSlug)
+        : [...list.movieSlugs, movieSlug];
+      return { ...list, movieSlugs: newSlugs };
+    }
+    return list;
+  });
+  setCustomLists(updated);
+  localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
+};
    
     const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem('movie_watchlist');
@@ -204,7 +259,11 @@ export function MovieProvider({ children }) {
         value={{
               currentUser,
               updateProfile,
-            followingList,  
+        followingList,
+        customLists,
+              createCustomList,
+              deleteCustomList,
+              toggleMovieInList,
     toggleFollow,
         login,
         register,

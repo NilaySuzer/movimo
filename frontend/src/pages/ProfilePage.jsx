@@ -13,15 +13,16 @@ import {
   Share2,
   Search,       
   UserPlus,    
-  UserCheck, Sparkles    
+  UserCheck, Sparkles,  ListPlus, Film, FolderHeart, X 
 } from 'lucide-react';
 import QuickReviewModal from '../components/QuickReviewModal';
 import { useMovies } from '../context/MovieContext';
-import { movies } from '../data/moviesData';
+import { movies, movies as allMoviesData} from '../data/moviesData';
 import { communityUsers } from '../data/usersData'; 
 import EditProfileModal from '../components/EditProfileModal';
 import FollowModal from '../components/FollowModal';
 import '../styles/profile.css';
+import { useToast } from '../context/ToastContext';
 
 const initialUserData = {
   name: "Nilay Süzer",
@@ -49,7 +50,33 @@ export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [followModalTab, setFollowModalTab] = useState('followers');
-  // Context'ten dinamik verileri alıyoruz
+  // Context'ten dinamik verileri alıyoruz  const { customLists, createCustomList, deleteCustomList } = useMovies();
+    const { customLists = [], createCustomList, deleteCustomList } = useMovies();
+  const { showToast } = useToast();
+  
+    // Modal State'leri
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newListTitle, setNewListTitle] = useState('');
+    const [newListDesc, setNewListDesc] = useState('');
+  
+    const handleCreateList = (e) => {
+      e.preventDefault();
+      if (!newListTitle.trim()) return;
+      
+      createCustomList(newListTitle, newListDesc);
+      setNewListTitle('');
+      setNewListDesc('');
+      setIsModalOpen(false);
+      showToast('Yeni sinema listeniz oluşturuldu! 🎬', 'success');
+    };
+  
+    const handleDeleteList = (listId, listTitle) => {
+      if (window.confirm(`"${listTitle}" listesini silmek istediğinize emin misiniz?`)) {
+        deleteCustomList(listId);
+        showToast('Liste silindi.', 'info');
+      }
+    };
+  
   const { watchlist, followingList, likedMovies, userReviews, currentUser, deleteReview } = useMovies();
 const openFollowModal = (tabName) => {
     setFollowModalTab(tabName);
@@ -237,7 +264,129 @@ const openFollowModal = (tabName) => {
           </div>
         
         </div>
+ <section className="profile-section-custom-lists">
+        <div className="section-title-row">
+          <div className="title-with-icon">
+            <FolderHeart size={22} color="#f5c518" />
+            <h2>Özel Sinema Koleksiyonları ({customLists.length})</h2>
+          </div>
+          <button 
+            className="create-new-list-btn"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <ListPlus size={16} />
+            <span>Yeni Liste Oluştur</span>
+          </button>
+        </div>
 
+        {/* LİSTELER GRİDİ */}
+        <div className="custom-lists-grid">
+          {customLists.length > 0 ? (
+            customLists.map((list) => {
+              // Listedeki filmlerin afişlerini bul
+              const listMovies = (allMoviesData || []).filter((m) =>
+                list.movieSlugs.includes(m.slug)
+              );
+
+              return (
+                <div key={list.id} className="custom-list-card glass-panel">
+                  <div className="list-card-header">
+                    <h3>{list.title}</h3>
+                    <button
+                      className="delete-list-btn"
+                      title="Listeyi Sil"
+                      onClick={() => handleDeleteList(list.id, list.title)}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+
+                  {list.description && (
+                    <p className="list-card-desc">{list.description}</p>
+                  )}
+
+                  {/* Film Afişleri Önizleme Bandı (Letterboxd stack tarzı) */}
+                  <div className="list-posters-preview">
+                    {listMovies.length > 0 ? (
+                      listMovies.slice(0, 4).map((movie, idx) => (
+                        <Link 
+                          to={`/movie/${movie.slug}`} 
+                          key={movie.slug} 
+                          className="poster-preview-item"
+                          style={{ zIndex: 4 - idx }}
+                        >
+                          <img src={movie.poster} alt={movie.title} />
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="empty-list-indicator">
+                        <Film size={20} color="#555" />
+                        <span>Henüz film eklenmedi</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="list-card-footer">
+                    <span className="count-tag">{list.movieSlugs.length} Film</span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="empty-custom-lists glass-panel">
+              <p>Henüz özel bir film koleksiyonu oluşturmadınız.</p>
+            </div>
+          )}
+        </div>
+      </section>{isModalOpen && (
+              <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
+                <div className="modal-content glass-panel" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>Yeni Sinema Koleksiyonu</h3>
+                    <button className="close-modal-btn" onClick={() => setIsModalOpen(false)}>
+                      <X size={18} />
+                    </button>
+                  </div>
+      
+                  <form onSubmit={handleCreateList} className="modal-form">
+                    <div className="form-group">
+                      <label>Koleksiyon Başlığı *</label>
+                      <input
+                        type="text"
+                        placeholder="Örn: 90'lar Atmosferik Gerilimler"
+                        value={newListTitle}
+                        onChange={(e) => setNewListTitle(e.target.value)}
+                        autoFocus
+                        required
+                      />
+                    </div>
+      
+                    <div className="form-group">
+                      <label>Açıklama (Opsiyonel)</label>
+                      <textarea
+                        rows="3"
+                        placeholder="Bu liste hakkında kısa bir açıklama..."
+                        value={newListDesc}
+                        onChange={(e) => setNewListDesc(e.target.value)}
+                      ></textarea>
+                    </div>
+      
+                    <div className="modal-actions">
+                      <button 
+                        type="button" 
+                        className="cancel-btn"
+                        onClick={() => setIsModalOpen(false)}
+                      >
+                        Vazgeç
+                      </button>
+                      <button type="submit" className="confirm-btn">
+                        Listeyi Oluştur
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
         {/* 4. SEKMELER (TABS) */}
         <div className="profile-tabs-bar">
           <button 
