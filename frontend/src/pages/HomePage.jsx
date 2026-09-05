@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React , { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { movies, comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
@@ -183,48 +183,54 @@ export default function HomePage() {
         </section>
 
         {/* 7. ALL CATEGORIES & MOVIE GRIDS */}
-        <div className="general2">
-          {categories.map((cat) => {
-            const categoryMovies = movies.filter((m) => m.category === cat.id);
-            return (
-              <section id={cat.id} key={cat.id} className="category-section">
-                {/* KATEGORİ BAŞLIK SATIRI (Garantili Sağa Yaslama) */}
-<div className="category-header-row">
-  <div className="category-title-left">
-    <span 
-      className="category-accent-dot" 
-      style={{ backgroundColor: cat.color || '#f5c518' }}
-    ></span>
-    <h2 id={cat.id}>{cat.name}</h2>
-  </div>
+<div className="general2">
+  {categories.map((cat, index) => {
+    const categoryMovies = movies.filter((m) => m.category === cat.id);
+    return (
+      <React.Fragment key={cat.id}>
+        <section id={cat.id} className="category-section">
+          {/* KATEGORİ BAŞLIK SATIRI */}
+          <div className="category-header-row">
+            <div className="category-title-left">
+              <span 
+                className="category-accent-dot" 
+                style={{ backgroundColor: cat.color || '#f5c518' }}
+              ></span>
+              <h2 id={cat.id}>{cat.name}</h2>
+            </div>
 
-  {/* EN SAĞA YASLI BUTON */}
-  <Link 
-    to={`/category/${cat.id}`} 
-    className="view-all-btn glass-panel"
-    style={{ '--accent-color': cat.color || '#f5c518' }}
-  >
-    <span>Tümünü Gör</span>
-    <ArrowRight size={15} className="view-all-icon" />
-  </Link>
-</div>
-                <div className="card-container">
-                  {categoryMovies.map((movie) => (
-                    <div className="card" key={movie.slug}>
-                      <img src={movie.poster} alt={movie.title} />
-                      <div className="card-content">
-                        <div className="card-title">{movie.title}</div>
-                        <Link to={`/movie/${movie.slug}`} style={{ width: '100%' }}>
-                          <button style={{ backgroundColor: cat.color }}>Review</button>
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
+            {/* EN SAĞA YASLI BUTON */}
+            <Link 
+              to={`/category/${cat.id}`} 
+              className="view-all-btn glass-panel"
+              style={{ '--accent-color': cat.color || '#f5c518' }}
+            >
+              <span>Tümünü Gör</span>
+              <ArrowRight size={15} className="view-all-icon" />
+            </Link>
+          </div>
+
+          <div className="card-container">
+            {categoryMovies.map((movie) => (
+              <div className="card" key={movie.slug}>
+                <img src={movie.poster} alt={movie.title} />
+                <div className="card-content">
+                  <div className="card-title">{movie.title}</div>
+                  <Link to={`/movie/${movie.slug}`} style={{ width: '100%' }}>
+                    <button style={{ backgroundColor: cat.color }}>Review</button>
+                  </Link>
                 </div>
-              </section>
-            );
-          })}
-        </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Kategoriler Arası Neon Ayırıcı Çizgi */}
+        {index < categories.length - 1 && <div className="category-divider" />}
+      </React.Fragment>
+    );
+  })}
+</div>
 
         {/* 8. INTERACTIVE SECTION: MOVIE POLL & COMMUNITY ACTIVITY */}
         <div className="dual-section-grid">
