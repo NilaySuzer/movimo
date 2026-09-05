@@ -119,3 +119,101 @@
   align-items: center;
   gap: 12px;
 }
+/* ================= KATALOG FİLTRE VE SIRALAMA ÇUBUĞU ================= */
+/* ================= FİLTRE VE SIRALAMA KONTROL PANELİ ================= */
+.catalog-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  padding: 14px 22px;
+  margin: 10px auto 35px auto;
+  max-width: 1200px;
+  background: rgba(20, 20, 28, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ddd;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.cinema-select {
+  background: #111118;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.cinema-select:focus {
+  border-color: #f5c518;
+}
+
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-val-badge {
+  font-family: monospace;
+  font-size: 0.95rem;
+}
+
+.cinema-slider {
+  cursor: pointer;
+  width: 120px;
+}
+
+.results-badge {
+  margin-left: auto;
+  color: #888;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.reset-filter-btn {
+  margin-top: 14px;
+  color: #000;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.reset-filter-btn:hover {
+  transform: scale(1.03);
+  opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+  .catalog-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .results-badge {
+    margin-left: 0;
+    text-align: center;
+  }
+}
