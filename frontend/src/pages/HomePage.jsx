@@ -4,6 +4,7 @@ import { movies, comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import '../styles/home.css';
 import { ArrowRight } from 'lucide-react';
+import ActivityFeed from '../components/ActivityFeed';
 
 // 1. Hero Slider Verileri
 const featuredSlides = [
@@ -97,6 +98,8 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+
+      <ActivityFeed />
 
       <div className="general1">
       

@@ -1,0 +1,122 @@
+/* ================= TOPLULUK AKTİVİTE AKIŞI (DOLGUN & GENİŞ) ================= */
+.activity-feed-wrapper {
+  max-width: 1400px; /* Ekranla daha dengeli bir genişlik */
+  margin: 28px auto 45px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.activity-feed-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 24px; /* Yükseklik ve iç boşluk artırıldı */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 18, 26, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.feed-title-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f5c518;
+  font-weight: 800;
+  font-size: 0.95rem; /* Başlık büyütüldü */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-right: 20px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.pulse-icon {
+  animation: feedPulse 2s infinite ease-in-out;
+}
+
+@keyframes feedPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.feed-ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  white-space: nowrap;
+  width: 100%;
+  padding: 2px 0;
+}
+
+.feed-ticker-track::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.feed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 9px 18px; /* Hap butonlar dolgunlaştırıldı */
+  border-radius: 30px;
+  font-size: 0.9rem; /* Yazılar artık okunabilir boyutta */
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.feed-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(245, 197, 24, 0.4);
+  transform: translateY(-2px);
+}
+
+.feed-chip-user {
+  color: #fff;
+  font-weight: 700;
+}
+
+.feed-chip-action {
+  color: #a0a0a8;
+}
+
+.feed-chip-target {
+  color: #f5c518;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.feed-chip-target:hover {
+  text-decoration: underline;
+}
+
+.feed-chip-stars {
+  background: rgba(245, 197, 24, 0.15);
+  color: #f5c518;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 197, 24, 0.25);
+}
+
+.feed-chip-time {
+  color: #71717a;
+  font-size: 0.78rem;
+  margin-left: 4px;
+}
