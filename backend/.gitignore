@@ -1,0 +1,25 @@
+# Bağımlılıklar (Binlerce dosya içeren node_modules asla pushlanmaz)
+node_modules/
+package-lock.json
+
+# Çevre Değişkenleri ve Gizli Anahtarlar (EN KRİTİK GÜVENLİK ALANI)
+.env
+.env.local
+.env.*.local
+*.env
+
+# TypeScript derleme çıktısı
+dist/
+build/
+
+# Log ve Hata Dosyaları
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# İşletim Sistemi ve Editör Çöpleri
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
