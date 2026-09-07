@@ -1,0 +1,74 @@
+.cinematic-marquee-wrap {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  position: relative;
+  padding: 10px 0;
+  background: rgba(138, 120, 0, 0.278);
+  border-top: 1px solid rgba(245, 197, 24, 0.15);
+  border-bottom: 1px solid rgba(245, 197, 24, 0.15);
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 32px;
+  animation: marqueeScroll 28s linear infinite;
+}
+
+.cinematic-marquee-wrap.reverse .marquee-content {
+  animation: marqueeScrollReverse 28s linear infinite;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.marquee-icon {
+  color: #f5c518;
+}
+
+.marquee-dot {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marqueeScrollReverse {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}

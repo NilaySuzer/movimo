@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { movies, comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import '../styles/home.css';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Play, X} from 'lucide-react';
 import ActivityFeed from '../components/ActivityFeed';
+import MarqueeTicker from '../components/MarqueeTicker';
 
 // 1. Hero Slider Verileri
 const featuredSlides = [
@@ -77,6 +78,32 @@ export default function HomePage() {
     'Tenet'
   ];
 
+
+const [activeTrailer, setActiveTrailer] = useState(null); // { title: '', url: '' }
+
+// YouTube URL'sini embed linkine çeviren ve modalı açan fonksiyon:
+const handleWatchTrailer = (movie) => {
+  let rawUrl = movie?.trailerUrl || movie?.trailer || '';
+
+  // Eğer doğrudan embed değilse YouTube linkinden ID'yi çıkarıp embed yapalım:
+  if (rawUrl.includes('watch?v=')) {
+    rawUrl = rawUrl.replace('watch?v=', 'embed/');
+  } else if (rawUrl.includes('youtu.be/')) {
+    const id = rawUrl.split('youtu.be/')[1]?.split('?')[0];
+    rawUrl = `https://www.youtube.com/embed/${id}`;
+  }
+
+  // Otomatik oynatmayı ekleyelim
+  const embedUrl = rawUrl.includes('?') ? `${rawUrl}&autoplay=1` : `${rawUrl}?autoplay=1`;
+
+  setActiveTrailer({
+    title: movie?.title || 'Film Fragmanı',
+    url: embedUrl
+  });
+};
+
+
+
   return (
     <div className="home-wrapper">
       {/* 1. HERO SLIDER */}
@@ -125,6 +152,8 @@ export default function HomePage() {
           </div>
         </section>
 
+        
+
         {/* 4. TOP RATED MASTERPIECES */}
         <section className="category-section">
           <div className="section-header-box">
@@ -145,28 +174,35 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+<MarqueeTicker />
+       <div className="coming-soon-grid">
+  {comingSoonMovies.map((movie) => (
+    <div key={movie.id || movie.slug} className="theater-card glass-panel">
+      {/* Afiş */}
+      <img src={movie.poster} alt={movie.title} className="theater-poster" />
 
-        {/* 5. COMING SOON RIBBONS */}
-        <section className="category-section">
-          <div className="section-header-box">
-            <h2 style={{ color: '#f5c518' }}>🎬 Coming Soon to Theaters</h2>
-          </div>
-          <div className="movies--grid">
-            {comingSoonMovies.map((movie) => (
-              <div className="movie--card" key={movie.id}>
-                <div className="ribbon" title="Coming Soon">
-                  <img src="/imgs/clapperboard.png" alt="Video Camera" />
-                </div>
-                <img className="movie--poster" src={movie.poster} alt="Poster" />
-                <div className="movie--info">
-                  <a href={movie.trailerUrl} target="_blank" rel="noreferrer">
-                    <button>Watch trailer</button>
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+      {/* Karartma Gradyanı & Bilgi Katmanı */}
+      <div className="theater-card-overlay">
+        {/* Vizyon / Geri Sayım Rozeti */}
+        <span className="release-badge">Yakında</span>
+
+        {/* Alt Kısım: Başlık & Buton */}
+        <div className="theater-card-bottom">
+          <h4 className="theater-movie-title">{movie.title}</h4>
+          <button 
+            className="watch-trailer-btn"
+            onClick={() => handleWatchTrailer(movie)}
+          >
+            <Play size={14} fill="currentColor" />
+            <span>Fragmanı İzle</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  ))}
+        </div>
+        
+       <MarqueeTicker reverse />
 
         {/* 6. CATEGORY NAV BUTTONS */}
         <section className="buttons">
@@ -293,6 +329,27 @@ export default function HomePage() {
           </form>
         </section>
       </div>
+
+      
+{/* FRAGMAN POPUP MODALI */}
+      {activeTrailer && activeTrailer.url && (
+        <div className="trailer-modal-backdrop" onClick={() => setActiveTrailer(null)}>
+          <div className="trailer-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="trailer-close-btn" onClick={() => setActiveTrailer(null)}>
+              <X size={24} />
+            </button>
+            <div className="iframe-responsive-container">
+              <iframe
+                src={activeTrailer.url}
+                title={`${activeTrailer.title} Fragman`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

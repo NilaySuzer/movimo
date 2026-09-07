@@ -1,5 +1,5 @@
 .general1 {
-  padding: 10px 30px;
+  padding: 15px 30px;
   text-align: center;
 }
 
@@ -128,7 +128,7 @@
 
 /* Category Navigation Buttons */
 .buttons {
-  margin: 40px 0;
+  margin: 50px 0;
 }
 
 .button-container h2 {
@@ -955,4 +955,130 @@
   background: #0d0d13; /* Arka plan renginle eşleşmeli */
   padding: 0 10px;
   text-shadow: 0 0 8px #f5c518;
+}
+/* ================= COMING SOON TO THEATERS ================= */
+.coming-soon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  justify-content: center; /* Kart sütunlarını yatayda tam ortaya toplar */
+  gap: 28px;
+  max-width: 1400px;
+  margin: 35px auto 35px auto;
+  padding: 40px 50px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.theater-card {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.theater-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.75),
+    0 0 20px rgba(245, 197, 24, 0.2);
+  border-color: rgba(245, 197, 24, 0.5);
+}
+
+.theater-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.theater-card:hover .theater-poster {
+  transform: scale(1.05);
+}
+
+/* Afiş üzeri karartma gradyanı */
+.theater-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.85) 80%,
+    rgba(0, 0, 0, 0.98) 100%
+  );
+  box-sizing: border-box;
+}
+
+/* Sol üst köşe rozeti */
+.release-badge {
+  align-self: flex-start;
+  background: rgba(0, 0, 0, 0.65);
+  color: #f5c518;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 197, 24, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+/* Alt bilgi ve buton alanı */
+.theater-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theater-movie-title {
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+/* Parlayan cam fragman butonu */
+.watch-trailer-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.theater-card:hover .watch-trailer-btn {
+  background: #f5c518;
+  color: #000;
+  border-color: #f5c518;
+  box-shadow: 0 0 16px rgba(245, 197, 24, 0.45);
+}
+
+.watch-trailer-btn:active {
+  transform: scale(0.97);
 }
