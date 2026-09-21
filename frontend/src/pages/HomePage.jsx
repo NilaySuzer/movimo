@@ -1,6 +1,6 @@
 import React , { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { movies, comingSoonMovies } from '../data/moviesData';
+import { comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import '../styles/home.css';
 import { ArrowRight, Play, X} from 'lucide-react';
@@ -38,6 +38,25 @@ const featuredSlides = [
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+
+// 1. API'den gelen filmleri tutacak state:
+  const [movies, setMovies] = useState([]);
+
+  // 2. Sayfa açıldığında .NET API'den filmleri çek:
+  useEffect(() => {
+    fetch('http://localhost:5080/api/movies')
+      .then((res) => res.json())
+      .then((data) => {
+        // Backend'den gelen veri modelini (posterUrl -> poster, id -> slug) frontend ile uyumlu hale getiriyoruz
+        const formattedMovies = data.map((m) => ({
+          ...m,
+          poster: m.posterUrl || '/imgs/default.png',
+          slug: m.slug || m.id.toString(), // Detay sayfasına giderken id'yi kullanabilmesi için
+        }));
+        setMovies(formattedMovies);
+      })
+      .catch((err) => console.error('Filmler API\'den çekilemedi:', err));
+  }, []);
 
   // Anket State Yönetimi
   const [votedOption, setVotedOption] = useState(null);
