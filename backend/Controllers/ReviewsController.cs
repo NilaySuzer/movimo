@@ -43,8 +43,10 @@ public class ReviewsController : ControllerBase
     [HttpGet("user/{userName}")]
     public async Task<ActionResult<IEnumerable<object>>> GetReviewsByUser(string userName)
     {
+        var cleanName = userName.Trim().ToLower();
+
         var reviews = await _context.Reviews
-            .Where(r => r.User.ToLower() == userName.ToLower())
+            .Where(r => r.User.ToLower().Contains(cleanName) || cleanName.Contains(r.User.ToLower()))
             .OrderByDescending(r => r.CreatedAt)
             .Join(_context.Movies,
                 review => review.MovieId,

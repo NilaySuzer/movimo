@@ -119,7 +119,7 @@ export default function MovieDetail() {
       console.error(err);
     }
   };
-
+  const { currentUser } = useMovies();
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
   const [newCommentName, setNewCommentName] = useState('');
   const [newCommentText, setNewCommentText] = useState('');
@@ -182,17 +182,23 @@ export default function MovieDetail() {
     ? (comments.reduce((acc, c) => acc + (Number(c.rating) || 0), 0) / totalRatedComments).toFixed(1)
     : movie.imdb || '0.0';
 
-  // 3. YORUM EKLEME (POST) API ÇAĞRISI
+// 3. YORUM EKLEME (POST) API ÇAĞRISI
+ // 3. YORUM EKLEME (POST) API ÇAĞRISI
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!newCommentName.trim() || !newCommentText.trim()) return;
+    if (!newCommentText || !newCommentText.trim()) return;
+
+    // Aktif kullanıcının adı, yoksa elle girilen ad, o da yoksa varsayılan isim
+    const author = (currentUser && currentUser.name) 
+      ? currentUser.name 
+      : (typeof newCommentName !== 'undefined' && newCommentName.trim() ? newCommentName.trim() : "Nilay Süzer");
 
     const payload = {
       movieId: parseInt(slug, 10),
-      user: newCommentName.trim(),
+      user: author,
       comment: newCommentText.trim(),
-      rating: newCommentRating,
-      isSpoiler: isSpoiler,
+      rating: Number(newCommentRating) || 5,
+      isSpoiler: Boolean(isSpoiler),
       upvotes: 0
     };
 
@@ -203,17 +209,22 @@ export default function MovieDetail() {
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error('Yorum eklenemedi');
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Backend hata yanıtı:', errorText);
+        throw new Error('Yorum eklenemedi');
+      }
+
       const savedReview = await res.json();
 
-      setComments(prev => [savedReview, ...prev]);
-      setNewCommentName('');
+      setComments((prev) => [savedReview, ...prev]);
+      if (typeof setNewCommentName === 'function') setNewCommentName('');
       setNewCommentText('');
       setNewCommentRating(5);
       setIsSpoiler(false);
       showToast('Yorumunuz başarıyla eklendi!', 'success');
     } catch (err) {
-      console.error(err);
+      console.error('Yorum gönderme hatası:', err);
       showToast('Yorum kaydedilirken bir hata oluştu.', 'error');
     }
   };

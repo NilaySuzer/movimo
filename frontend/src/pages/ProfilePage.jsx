@@ -60,7 +60,7 @@ export default function ProfilePage() {
   // 1. Veritabanındaki tüm filmleri ve kullanıcının incelemelerini çek
   useEffect(() => {
     setLoading(true);
-    const authorName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Nilay';
+    const authorName = currentUser?.name || 'Nilay Süzer';
 
     Promise.all([
       fetch('http://localhost:5080/api/movies').then((res) => (res.ok ? res.json() : [])),
