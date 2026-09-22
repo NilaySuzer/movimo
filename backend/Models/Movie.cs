@@ -19,7 +19,7 @@ public class Movie
     public string? PosterUrl { get; set; }
 
     public string? Summary { get; set; }
-
+    public string Category { get; set; } = "general";
     public double AverageRating { get; set; } = 0.0;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
