@@ -42,21 +42,35 @@ export default function MovieDetail() {
   const { showToast } = useToast();
 
   // 1. .NET API'DEN FİLMİ VE YORUMLARI ÇEK
-  useEffect(() => {
+ useEffect(() => {
     window.scrollTo(0, 0);
     setLoading(true);
 
-    Promise.all([
-      fetch(`http://localhost:5080/api/movies/${slug}`).then((res) => {
-        if (!res.ok) throw new Error('Film bulunamadı');
-        return res.json();
-      }),
-      fetch(`http://localhost:5080/api/reviews/movie/${slug}`).then((res) => {
-        if (!res.ok) return [];
+    // 1. Önce filmi çek (ana veri)
+    fetch(`http://localhost:5080/api/movies/${slug}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Film API yanıt vermedi');
         return res.json();
       })
-    ])
-      .then(([movieData, reviewsData]) => {
+      .then(async (movieData) => {
+        // 2. Yorumları çek (hata alsa da filmi patlatmasın)
+        let reviewsData = [];
+        try {
+          const revRes = await fetch(`http://localhost:5080/api/reviews/movie/${movieData.id}`);
+          if (revRes.ok) reviewsData = await revRes.json();
+        } catch (e) {
+          console.warn('Yorumlar çekilemedi:', e);
+        }
+
+        // 3. Trivia verilerini çek (hata alsa da filmi patlatmasın)
+        let triviasData = [];
+        try {
+          const trivRes = await fetch(`http://localhost:5080/api/trivias/movie/${movieData.id}`);
+          if (trivRes.ok) triviasData = await trivRes.json();
+        } catch (e) {
+          console.warn('Trivia çekilemedi:', e);
+        }
+
         const formatted = {
           ...movieData,
           slug: movieData.id.toString(),
@@ -69,27 +83,17 @@ export default function MovieDetail() {
           watchUrl: movieData.watchUrl || 'https://www.plex.tv',
           cast: movieData.cast || [
             { name: "Matthew McConaughey", role: "Cooper", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
-            { name: "Anne Hathaway", role: "Brand", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
-            { name: "Jessica Chastain", role: "Murph", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
-            { name: "Michael Caine", role: "Professor Brand", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80" }
+            { name: "Anne Hathaway", role: "Brand", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" }
           ],
-          trivia: [
-            {
-              title: "🎬 Çekim Anekdotları & Kamera Arkası",
-              content: `${movieData.title} çekimlerinde pratik efektler, minyatür modeller ve gerçek astrofizik hesaplamaları yoğun olarak kullanıldı.`
-            },
-            {
-              title: "🌌 Bilimsel Danışmanlık",
-              content: "Nobel ödüllü astrofizikçi Kip Thorne, filmdeki kara delik ve solucan deliği sahnelerinin denklemlerini bizzat modelledi."
-            }
-          ]
+          trivia: triviasData
         };
+
         setMovie(formatted);
         setComments(reviewsData);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('API Hatası:', err);
+        console.error('Film yüklenirken hata:', err);
         setMovie(null);
         setLoading(false);
       });
@@ -560,26 +564,32 @@ export default function MovieDetail() {
           <h2>Film Hakkında Bilinmeyenler & Notlar</h2>
         </div>
         <div className="accordion-wrapper">
-          {triviaData.map((item, idx) => {
-            const isOpen = openAccordion === idx;
-            return (
-              <div key={idx} className={`accordion-card glass-panel ${isOpen ? 'active' : ''}`}>
-                <button 
-                  type="button" 
-                  className="accordion-header-btn" 
-                  onClick={() => setOpenAccordion(isOpen ? null : idx)}
-                >
-                  <span className="acc-title">{item.title}</span>
-                  {isOpen ? <ChevronUp size={18} color="#f5c518" /> : <ChevronDown size={18} color="#aaa" />}
-                </button>
-                {isOpen && (
-                  <div className="accordion-content">
-                    <p>{item.content}</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {triviaData && triviaData.length > 0 ? (
+            triviaData.map((item, idx) => {
+              const isOpen = openAccordion === idx;
+              return (
+                <div key={item.id || idx} className={`accordion-card glass-panel ${isOpen ? 'active' : ''}`}>
+                  <button 
+                    type="button" 
+                    className="accordion-header-btn" 
+                    onClick={() => setOpenAccordion(isOpen ? null : idx)}
+                  >
+                    <span className="acc-title">{item.title}</span>
+                    {isOpen ? <ChevronUp size={18} color="#f5c518" /> : <ChevronDown size={18} color="#aaa" />}
+                  </button>
+                  {isOpen && (
+                    <div className="accordion-content">
+                      <p>{item.content}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <p style={{ color: '#888', fontStyle: 'italic', padding: '1rem' }}>
+              Bu film için henüz kamera arkası notu eklenmemiş.
+            </p>
+          )}
         </div>
       </section>
     </div>
