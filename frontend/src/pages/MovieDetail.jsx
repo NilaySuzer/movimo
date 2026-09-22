@@ -26,46 +26,48 @@ export default function MovieDetail() {
   const navigate = useNavigate();
   const [isSpoiler, setIsSpoiler] = useState(false);
   const [unblurredComments, setUnblurredComments] = useState({});
-  const [commentVotes, setCommentVotes] = useState({});
 
-  // API'den gelen dinamik film state'i
+  // API'den gelen dinamik film ve yorum state'leri
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState([]);
 
   // Context'ten dinamik fonksiyon ve durumlar
   const { 
     isInWatchlist, 
     toggleWatchlist, 
     isMovieLiked, 
-    toggleLike,
-    addReview,
-    userReviews 
+    toggleLike
   } = useMovies();
   const { showToast } = useToast();
 
-  // 1. .NET API'DEN FİLM DETAYINI ÇEK
+  // 1. .NET API'DEN FİLMİ VE YORUMLARI ÇEK
   useEffect(() => {
     window.scrollTo(0, 0);
     setLoading(true);
 
-    fetch(`http://localhost:5080/api/movies/${slug}`)
-      .then((res) => {
+    Promise.all([
+      fetch(`http://localhost:5080/api/movies/${slug}`).then((res) => {
         if (!res.ok) throw new Error('Film bulunamadı');
         return res.json();
+      }),
+      fetch(`http://localhost:5080/api/reviews/movie/${slug}`).then((res) => {
+        if (!res.ok) return [];
+        return res.json();
       })
-      .then((data) => {
-        // Backend modelini frontend'in beklediği yapıya eşleyelim
+    ])
+      .then(([movieData, reviewsData]) => {
         const formatted = {
-          ...data,
-          slug: data.id.toString(),
-          poster: data.posterUrl || '/imgs/default.png',
-          displayTitle: data.title,
-          description: data.summary,
-          imdb: data.averageRating || '8.5',
-          category: data.category || 'sci-fi',
-          trailerUrl: data.trailerUrl || 'https://www.youtube.com/watch?v=zSWdZVtXT7E', // Interstellar varsayılan fragmanı
-          watchUrl: data.watchUrl || 'https://www.plex.tv',
-          cast: data.cast || [
+          ...movieData,
+          slug: movieData.id.toString(),
+          poster: movieData.posterUrl || '/imgs/default.png',
+          displayTitle: movieData.title,
+          description: movieData.summary,
+          imdb: movieData.averageRating || '8.5',
+          category: movieData.category || 'sci-fi',
+          trailerUrl: movieData.trailerUrl || 'https://www.youtube.com/watch?v=zSWdZVtXT7E',
+          watchUrl: movieData.watchUrl || 'https://www.plex.tv',
+          cast: movieData.cast || [
             { name: "Matthew McConaughey", role: "Cooper", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
             { name: "Anne Hathaway", role: "Brand", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
             { name: "Jessica Chastain", role: "Murph", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
@@ -74,7 +76,7 @@ export default function MovieDetail() {
           trivia: [
             {
               title: "🎬 Çekim Anekdotları & Kamera Arkası",
-              content: `${data.title} çekimlerinde pratik efektler, minyatür modeller ve gerçek astrofizik hesaplamaları yoğun olarak kullanıldı.`
+              content: `${movieData.title} çekimlerinde pratik efektler, minyatür modeller ve gerçek astrofizik hesaplamaları yoğun olarak kullanıldı.`
             },
             {
               title: "🌌 Bilimsel Danışmanlık",
@@ -83,6 +85,7 @@ export default function MovieDetail() {
           ]
         };
         setMovie(formatted);
+        setComments(reviewsData);
         setLoading(false);
       })
       .catch((err) => {
@@ -96,12 +99,21 @@ export default function MovieDetail() {
     setUnblurredComments(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
 
-  const handleVote = (idx) => {
-    setCommentVotes(prev => {
-      const current = prev[idx] || 0;
-      return { ...prev, [idx]: current + 1 };
-    });
-    showToast('İnceleme faydalı bulundu olarak işaretlendi 👍', 'info');
+  // 2. YORUM BEĞENME (UPVOTE) API ÇAĞRISI
+  const handleVote = async (reviewId, idx) => {
+    try {
+      const res = await fetch(`http://localhost:5080/api/reviews/${reviewId}/upvote`, {
+        method: 'POST'
+      });
+      if (!res.ok) throw new Error('Upvote başarısız');
+
+      setComments(prev =>
+        prev.map((c, i) => (i === idx ? { ...c, upvotes: (c.upvotes || 0) + 1 } : c))
+      );
+      showToast('İnceleme faydalı bulundu olarak işaretlendi 👍', 'info');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
@@ -139,19 +151,6 @@ export default function MovieDetail() {
   const inWatchlist = isInWatchlist(slug);
   const triviaData = movie.trivia;
 
-  // Yorumları birleştirme
-  const movieContextReviews = (userReviews || [])
-    .filter((r) => r.slug === slug)
-    .map((r) => ({
-      user: r.user || 'Sen (İncelemen)',
-      text: r.comment || r.text,
-      rating: r.rating,
-      date: r.date || 'Az önce',
-      isSpoiler: Boolean(r.isSpoiler),
-      upvotes: r.upvotes || 0
-    }));
-
-  const allComments = [...movieContextReviews, ...(movie.comments || [])];
   const themeColor = categoryInfo.color;
   const dynamicBackground = `radial-gradient(circle at top right, ${themeColor}22 0%, #0d0d11 60%)`;
 
@@ -167,39 +166,52 @@ export default function MovieDetail() {
   const embedUrl = getYouTubeEmbedUrl(movie.trailerUrl);
   const castList = movie.cast;
 
-  const totalRatedComments = allComments.filter((c) => c.rating).length;
+  // Dinamik Skor ve Histogram
+  const totalRatedComments = comments.filter((c) => c.rating).length;
   const ratingDistribution = [5, 4, 3, 2, 1].map((star) => {
-    const count = allComments.filter((c) => Number(c.rating) === star).length;
+    const count = comments.filter((c) => Number(c.rating) === star).length;
     const percentage = totalRatedComments > 0 ? Math.round((count / totalRatedComments) * 100) : 0;
     return { stars: star, count, percentage };
   });
 
   const averageCommunityScore = totalRatedComments > 0
-    ? (allComments.reduce((acc, c) => acc + (Number(c.rating) || 0), 0) / totalRatedComments).toFixed(1)
+    ? (comments.reduce((acc, c) => acc + (Number(c.rating) || 0), 0) / totalRatedComments).toFixed(1)
     : movie.imdb || '0.0';
 
-  const handleCommentSubmit = (e) => {
+  // 3. YORUM EKLEME (POST) API ÇAĞRISI
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newCommentName.trim() || !newCommentText.trim()) return;
 
-    addReview({
-      slug: movie.slug,
-      movieTitle: movie.displayTitle || movie.title,
-      poster: movie.poster,
-      rating: newCommentRating,
-      comment: newCommentText.trim(),
-      text: newCommentText.trim(),
+    const payload = {
+      movieId: parseInt(slug, 10),
       user: newCommentName.trim(),
-      date: 'Az önce',
+      comment: newCommentText.trim(),
+      rating: newCommentRating,
       isSpoiler: isSpoiler,
       upvotes: 0
-    });
+    };
 
-    setNewCommentName('');
-    setNewCommentText('');
-    setNewCommentRating(5);
-    setIsSpoiler(false);
-    showToast('Yorumunuz başarıyla eklendi!', 'success');
+    try {
+      const res = await fetch('http://localhost:5080/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Yorum eklenemedi');
+      const savedReview = await res.json();
+
+      setComments(prev => [savedReview, ...prev]);
+      setNewCommentName('');
+      setNewCommentText('');
+      setNewCommentRating(5);
+      setIsSpoiler(false);
+      showToast('Yorumunuz başarıyla eklendi!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Yorum kaydedilirken bir hata oluştu.', 'error');
+    }
   };
 
   const handleShare = () => {
@@ -386,7 +398,7 @@ export default function MovieDetail() {
       {/* YORUM YAZMA VE LİSTESİ */}
       <section id="comment-section" className="comments-module-container">
         <div className="comments-header">
-          <h2>💬 Kullanıcı İncelemeleri ({allComments.length})</h2>
+          <h2>💬 Kullanıcı İncelemeleri ({comments.length})</h2>
           <span className="scroll-hint-pill">Aşağı kaydırarak tüm incelemeleri inceleyebilirsiniz</span>
         </div>
 
@@ -461,18 +473,20 @@ export default function MovieDetail() {
         </div>
 
         <div className="comments-scroll-feed">
-          {allComments.length > 0 ? (
-            allComments.map((c, index) => {
+          {comments.length > 0 ? (
+            comments.map((c, index) => {
               const hasSpoiler = c.isSpoiler;
               const isRevealed = unblurredComments[index];
               return (
-                <div key={index} className="single-comment-card glass-panel">
+                <div key={c.id || index} className="single-comment-card glass-panel">
                   <div className="comment-card-top">
                     <div className="commenter-meta">
                       <strong className="commenter-name" style={{ color: themeColor }}>
                         {c.user}
                       </strong>
-                      <span className="comment-date-tag">{c.date || 'Az önce'}</span>
+                      <span className="comment-date-tag">
+                        {c.createdAt ? new Date(c.createdAt).toLocaleDateString('tr-TR') : (c.date || 'Az önce')}
+                      </span>
                       {hasSpoiler && (
                         <span className="spoiler-tag-badge">
                           <ShieldAlert size={12} /> SPOILER
@@ -491,7 +505,7 @@ export default function MovieDetail() {
 
                   <div className="comment-text-wrapper">
                     <p className={`commenter-text ${hasSpoiler && !isRevealed ? 'spoiler-blurred' : ''}`}>
-                      {c.text}
+                      {c.comment || c.text}
                     </p>
 
                     {hasSpoiler && !isRevealed && (
@@ -521,10 +535,10 @@ export default function MovieDetail() {
                     <button
                       type="button"
                       className="upvote-btn"
-                      onClick={() => handleVote(index)}
+                      onClick={() => handleVote(c.id, index)}
                     >
                       <ThumbsUp size={14} />
-                      <span>Faydalı Buldum ({commentVotes[index] || c.upvotes || 0})</span>
+                      <span>Faydalı Buldum ({c.upvotes || 0})</span>
                     </button>
                   </div>
                 </div>
