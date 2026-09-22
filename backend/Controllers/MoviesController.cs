@@ -51,6 +51,33 @@ public class MoviesController : ControllerBase
         return CreatedAtAction(nameof(GetMovie), new { id = movie.Id }, movie);
     }
 
+    // PUT: api/movies/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateMovie(int id, Movie movie)
+    {
+        if (id != movie.Id)
+        {
+            return BadRequest(new { message = "ID uyuşmuyor." });
+        }
+
+        _context.Entry(movie).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Movies.Any(e => e.Id == id))
+            {
+                return NotFound(new { message = "Film bulunamadı." });
+            }
+            throw;
+        }
+
+        return NoContent();
+    }
+
     // DELETE: api/movies/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteMovie(int id)
