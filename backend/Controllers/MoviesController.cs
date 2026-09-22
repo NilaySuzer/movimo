@@ -17,10 +17,19 @@ public class MoviesController : ControllerBase
     }
 
     // GET: api/movies
+    // GET: api/movies?comingSoon=true
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
+    public async Task<ActionResult<IEnumerable<Movie>>> GetMovies([FromQuery] bool? comingSoon = null)
     {
-        var movies = await _context.Movies
+        var query = _context.Movies.AsQueryable();
+
+        // Eğer ?comingSoon=true veya ?comingSoon=false gönderildiyse filtrele
+        if (comingSoon.HasValue)
+        {
+            query = query.Where(m => m.IsComingSoon == comingSoon.Value);
+        }
+
+        var movies = await query
             .OrderByDescending(m => m.CreatedAt)
             .ToListAsync();
 

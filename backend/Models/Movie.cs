@@ -18,8 +18,11 @@ public class Movie
 
     public string? PosterUrl { get; set; }
 
+    public string? TrailerUrl { get; set; }
+
     public string? Summary { get; set; }
-    public string Category { get; set; } = "general";
+    public string Category { get; set; } = "general"; public bool IsComingSoon { get; set; } = false;
+    public string? ReleaseDateText { get; set; }
     public double AverageRating { get; set; } = 0.0;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

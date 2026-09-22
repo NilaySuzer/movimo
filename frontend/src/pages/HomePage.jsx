@@ -41,6 +41,7 @@ export default function HomePage() {
 
 // 1. API'den gelen filmleri tutacak state:
   const [movies, setMovies] = useState([]);
+  const [comingSoonList, setComingSoonList] = useState([]);
 
   // 2. Sayfa açıldığında .NET API'den filmleri çek:
   useEffect(() => {
@@ -68,6 +69,14 @@ export default function HomePage() {
       .then((data) => setPollOptions(data))
       .catch((err) => console.error('Anket verisi alınamadı:', err));
   }, []);
+
+ useEffect(() => {
+  fetch('http://localhost:5080/api/movies?comingSoon=true')
+    .then((res) => (res.ok ? res.json() : []))
+    .then((data) => setComingSoonList(data))
+    .catch((err) => console.error('Coming soon filmleri alınamadı:', err));
+}, []);
+
 
   const handleVote = async (id) => {
     if (votedOption !== null) return;
@@ -212,10 +221,10 @@ const handleWatchTrailer = (movie) => {
         </section>
 <MarqueeTicker />
        <div className="coming-soon-grid">
-  {comingSoonMovies.map((movie) => (
+  {comingSoonList.map((movie) => (
     <div key={movie.id || movie.slug} className="theater-card glass-panel">
       {/* Afiş */}
-      <img src={movie.poster} alt={movie.title} className="theater-poster" />
+      <img src={movie.posterUrl} alt={movie.title} className="theater-poster" />
 
       {/* Karartma Gradyanı & Bilgi Katmanı */}
       <div className="theater-card-overlay">
