@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<PollOption> PollOptions => Set<PollOption>();
 
+    public DbSet<UserInteraction> UserInteractions => Set<UserInteraction>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
