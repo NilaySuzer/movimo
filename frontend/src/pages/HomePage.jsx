@@ -58,9 +58,32 @@ export default function HomePage() {
       .catch((err) => console.error('Filmler API\'den çekilemedi:', err));
   }, []);
 
-  // Anket State Yönetimi
+// Anket State Yönetimi (Dinamik)
+  const [pollOptions, setPollOptions] = useState([]);
   const [votedOption, setVotedOption] = useState(null);
-  const [pollVotes, setPollVotes] = useState({ 0: 42, 1: 18, 2: 65, 3: 29 });
+
+  useEffect(() => {
+    fetch('http://localhost:5080/api/polls')
+      .then((res) => res.json())
+      .then((data) => setPollOptions(data))
+      .catch((err) => console.error('Anket verisi alınamadı:', err));
+  }, []);
+
+  const handleVote = async (id) => {
+    if (votedOption !== null) return;
+    setVotedOption(id);
+
+    try {
+      const res = await fetch(`http://localhost:5080/api/polls/vote/${id}`, { method: 'POST' });
+      if (res.ok) {
+        setPollOptions((prev) =>
+          prev.map((opt) => (opt.id === id ? { ...opt, votes: opt.votes + 1 } : opt))
+        );
+      }
+    } catch (err) {
+      console.error('Oy verilemedi:', err);
+    }
+  };
 
   // Slider Otomasyonu
   useEffect(() => {
@@ -69,12 +92,6 @@ export default function HomePage() {
     }, 4500);
     return () => clearInterval(timer);
   }, []);
-
-  const handleVote = (index) => {
-    if (votedOption !== null) return;
-    setVotedOption(index);
-    setPollVotes((prev) => ({ ...prev, [index]: prev[index] + 1 }));
-  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -296,14 +313,14 @@ const handleWatchTrailer = (movie) => {
               Christopher Nolan'ın kariyerindeki en iyi başyapıt hangisi?
             </p>
             <div className="poll-options">
-              {pollQuestions.map((q, idx) => (
+              {pollOptions.map((opt) => (
                 <button
-                  key={idx}
-                  className={`poll-option-btn ${votedOption === idx ? 'selected' : ''}`}
-                  onClick={() => handleVote(idx)}
+                  key={opt.id}
+                  className={`poll-option-btn ${votedOption === opt.id ? 'selected' : ''}`}
+                  onClick={() => handleVote(opt.id)}
                 >
-                  <span>{q}</span>
-                  {votedOption !== null && <span>{pollVotes[idx]} Votes</span>}
+                  <span>{opt.text}</span>
+                  {votedOption !== null && <span>{opt.votes} Votes</span>}
                 </button>
               ))}
             </div>
