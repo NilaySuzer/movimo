@@ -10,4 +10,5 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Movie> Movies => Set<Movie>();
+    public DbSet<Review> Reviews => Set<Review>();
 }
