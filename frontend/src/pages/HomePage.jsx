@@ -6,7 +6,7 @@ import '../styles/home.css';
 import { ArrowRight, Play, X} from 'lucide-react';
 import ActivityFeed from '../components/ActivityFeed';
 import MarqueeTicker from '../components/MarqueeTicker';
-
+import { useToast } from '../context/ToastContext';
 // 1. Hero Slider Verileri
 const featuredSlides = [
   {
@@ -38,7 +38,8 @@ const featuredSlides = [
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
-
+const [newsletterEmail, setNewsletterEmail] = useState('');
+const { showToast } = useToast();
 // 1. API'den gelen filmleri tutacak state:
   const [movies, setMovies] = useState([]);
   const [comingSoonList, setComingSoonList] = useState([]);
@@ -147,6 +148,32 @@ const handleWatchTrailer = (movie) => {
   });
 };
 
+  const handleNewsletterSubmit = async (e) => {
+  e.preventDefault();
+  if (!newsletterEmail.trim()) return;
+
+  try {
+    const res = await fetch('http://localhost:5080/api/newsletter/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: newsletterEmail.trim() })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      showToast(data.message || 'Bültene abone olundu! 📬', 'success');
+      setNewsletterEmail('');
+    } else if (res.status === 409) {
+      showToast(data.message || 'Bu e-posta zaten kayıtlı.', 'info');
+    } else {
+      showToast(data.message || 'Bir hata oluştu.', 'error');
+    }
+  } catch (err) {
+    console.error('Newsletter hatası:', err);
+    showToast('Sunucuya bağlanılamadı.', 'error');
+  }
+};
 
 
   return (
@@ -366,11 +393,18 @@ const handleWatchTrailer = (movie) => {
 
         {/* 9. NEWSLETTER BOX */}
         <section id="newsletter" className="newsletter-card">
-          <h2>📬 Movie Buffs Newsletter</h2>
+          <h2>📬 Film Önerileri Bülteni</h2>
           <p>Her cuma günün ve haftanın en iyi film tavsiyelerini doğrudan e-posta kutuna gönderelim.</p>
-          <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert('Subscribed successfully!'); }}>
-            <input className="newsletter-input" type="email" placeholder="Enter your email address..." required />
-            <button className="newsletter-btn" type="submit">Subscribe</button>
+          <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+            <input
+              className="newsletter-input"
+                type="email"
+                placeholder="E-posta adresinizi girin..."
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                required
+              />
+            <button className="newsletter-btn" type="submit">Abone Ol</button>
           </form>
         </section>
       </div>
