@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Image, Film, User } from 'lucide-react';
-import { movies } from '../data/moviesData';
 import { useMovies } from '../context/MovieContext';
 import '../styles/editProfile.css';
 
 export default function EditProfileModal({ isOpen, onClose }) {
-  const { currentUser, updateProfile } = useMovies();
+  const { currentUser, updateProfile, movies } = useMovies(); // 👈 API filmleri Context'ten alındı
 
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -21,13 +20,15 @@ export default function EditProfileModal({ isOpen, onClose }) {
       setBio(currentUser.bio || '');
       setAvatar(currentUser.avatar || '');
       setBanner(currentUser.banner || '');
-      setPinned(
-        currentUser.pinnedFavorites && currentUser.pinnedFavorites.length === 4
-          ? currentUser.pinnedFavorites
-          : ['dark-knight', 'interstellar', 'corpse-bride', 'matrix']
-      );
+      
+      // Kayıtlı pinned yoksa veya slug formatındaysa güvenli fallback
+      const currentPinned = currentUser.pinnedFavorites && currentUser.pinnedFavorites.length === 4
+        ? currentUser.pinnedFavorites.map(String)
+        : (movies.slice(0, 4).map(m => m.id.toString()));
+
+      setPinned(currentPinned.length === 4 ? currentPinned : ['', '', '', '']);
     }
-  }, [currentUser, isOpen]);
+  }, [currentUser, isOpen, movies]);
 
   if (!isOpen || !currentUser) return null;
 
@@ -67,7 +68,14 @@ export default function EditProfileModal({ isOpen, onClose }) {
         <form onSubmit={handleSubmit} className="edit-form">
           {/* Canlı Önizleme */}
           <div className="edit-preview-row">
-            <img src={avatar} alt="Avatar Önizleme" className="avatar-preview-img" onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'; }} />
+            <img
+              src={avatar}
+              alt="Avatar Önizleme"
+              className="avatar-preview-img"
+              onError={(e) => {
+                e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+              }}
+            />
             <div className="preview-meta">
               <strong>{name || 'Kullanıcı Adı'}</strong>
               <span>{username || '@kullanici'}</span>
@@ -128,7 +136,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Sabitlenen 4 Favori Film */}
+          {/* Sabitlenen 4 Favori Film (API Bağlantılı) */}
           <div className="pinned-selection-section">
             <label className="section-label">
               <Film size={16} color="#f5c518" />
@@ -145,9 +153,9 @@ export default function EditProfileModal({ isOpen, onClose }) {
                     required
                   >
                     <option value="">Film Seç...</option>
-                    {movies.map((m) => (
-                      <option key={m.slug} value={m.slug}>
-                        {m.title}
+                    {movies && movies.map((m) => (
+                      <option key={m.id} value={m.id.toString()}>
+                        {m.title} ({m.releaseYear || '2024'})
                       </option>
                     ))}
                   </select>

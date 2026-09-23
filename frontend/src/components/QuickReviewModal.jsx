@@ -1,38 +1,61 @@
 import React, { useState } from 'react';
 import { X, Star, Film } from 'lucide-react';
-import { movies } from '../data/moviesData';
 import { useMovies } from '../context/MovieContext';
 import '../styles/modal.css';
 
-export default function QuickReviewModal({ isOpen, onClose, lang }) {
-  const [selectedMovie, setSelectedMovie] = useState('');
-  const { addReview } = useMovies();
+export default function QuickReviewModal({ isOpen, onClose, lang, onReviewAdded }) {
+  const { movies, currentUser } = useMovies(); // 👈 API filmleri ve aktif kullanıcı
+  const [selectedMovieId, setSelectedMovieId] = useState('');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [isSpoiler, setIsSpoiler] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedMovie || !comment.trim()) return;
-    const targetMovie = movies.find(m => m.title === selectedMovie);
+    if (!selectedMovieId || !comment.trim() || isSubmitting) return;
 
-    // user alanını ekleyerek Context ile tam uyumlu hale getiriyoruz
-    addReview({
-      slug: targetMovie ? targetMovie.slug : 'custom',
-      movieTitle: selectedMovie,
-      poster: targetMovie ? targetMovie.poster : '/imgs/dk.png',
-      rating,
+    setIsSubmitting(true);
+
+    const payload = {
+      movieId: parseInt(selectedMovieId, 10),
+      user: currentUser?.name || 'Nilay Süzer',
       comment: comment.trim(),
-      user: 'Nilay Süzer' // Profil sahibi adı
-    });
+      rating: Number(rating),
+      isSpoiler: Boolean(isSpoiler),
+      upvotes: 0
+    };
 
-    alert(lang === 'TR' ? 'İncelemeniz başarıyla paylaşıldı! 🎬' : 'Review posted successfully! 🎬');
-    setSelectedMovie('');
-    setComment('');
-    setRating(5);
-    onClose();
+    try {
+      const res = await fetch('http://localhost:5080/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Yorum kaydedilemedi');
+
+      alert(lang === 'TR' ? 'İncelemeniz başarıyla paylaşıldı! 🎬' : 'Review posted successfully! 🎬');
+      
+      // Profil sayfasındaki yorum listesini anında tetikle/yenile
+      if (typeof onReviewAdded === 'function') {
+        onReviewAdded();
+      }
+
+      setSelectedMovieId('');
+      setComment('');
+      setRating(5);
+      setIsSpoiler(false);
+      onClose();
+    } catch (err) {
+      console.error('İnceleme ekleme hatası:', err);
+      alert(lang === 'TR' ? 'İnceleme kaydedilirken sunucu hatası oluştu.' : 'Failed to submit review.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -51,14 +74,16 @@ export default function QuickReviewModal({ isOpen, onClose, lang }) {
         <form onSubmit={handleSubmit} className="modal-form">
           <label>{lang === 'TR' ? 'Film Seç:' : 'Select Movie:'}</label>
           <select 
-            value={selectedMovie} 
-            onChange={(e) => setSelectedMovie(e.target.value)} 
+            value={selectedMovieId} 
+            onChange={(e) => setSelectedMovieId(e.target.value)} 
             required
             className="modal-select"
           >
             <option value="">{lang === 'TR' ? '-- Film Seçiniz --' : '-- Choose a Movie --'}</option>
-            {movies.map((m) => (
-              <option key={m.slug} value={m.title}>{m.title}</option>
+            {movies && movies.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.title} ({m.releaseYear || '2024'})
+              </option>
             ))}
           </select>
 
@@ -89,8 +114,23 @@ export default function QuickReviewModal({ isOpen, onClose, lang }) {
             className="modal-textarea"
           ></textarea>
 
-          <button type="submit" className="modal-submit-btn">
-            {lang === 'TR' ? 'İncelemeyi Kaydet' : 'Save & Publish'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '10px 0 15px' }}>
+            <input
+              type="checkbox"
+              id="quickSpoilerCheck"
+              checked={isSpoiler}
+              onChange={(e) => setIsSpoiler(e.target.checked)}
+              style={{ width: '16px', height: '16px', accentColor: '#f5c518' }}
+            />
+            <label htmlFor="quickSpoilerCheck" style={{ fontSize: '0.85rem', color: '#ccc', cursor: 'pointer' }}>
+              {lang === 'TR' ? 'Spoiler içeriyor' : 'Contains spoiler'}
+            </label>
+          </div>
+
+          <button type="submit" className="modal-submit-btn" disabled={isSubmitting}>
+            {isSubmitting 
+              ? (lang === 'TR' ? 'Kaydediliyor...' : 'Saving...') 
+              : (lang === 'TR' ? 'İncelemeyi Kaydet' : 'Save & Publish')}
           </button>
         </form>
       </div>
