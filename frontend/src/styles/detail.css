@@ -186,7 +186,7 @@
   padding: 0 24px;
   border: none;
   border-radius: 8px;
-  color: #000;
+  color: #fff;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -198,7 +198,7 @@
 
 .submit-comment-btn-inline:hover {
   background: #b20710 !important;
-  color: #fff;
+  color: #000;
 }
 
 /* Scroll Edilebilir İncelemeler Listesi */

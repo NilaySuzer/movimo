@@ -146,17 +146,23 @@ export default function MovieDetail() {
     );
   }
 
-  const categoryInfo = categories.find((c) => c.id === movie.category) || {
+const categoryInfo = categories.find(
+    (c) => c.id?.toLowerCase() === movie?.category?.toLowerCase()
+  ) || {
     color: '#f5c518',
     name: 'Featured'
   };
 
+  const themeColor = categoryInfo.color || '#f5c518';
+
+  // Eğer renk hex değilse veya bozulmasın diye güvenli radial background:
+  const dynamicBackground = themeColor.startsWith('#')
+    ? `radial-gradient(circle at top right, ${themeColor.slice(0, 7)}22 0%, #0d0d11 60%)`
+    : `radial-gradient(circle at top right, rgba(245, 197, 24, 0.15) 0%, #0d0d11 60%)`;
+
   const isLiked = isMovieLiked(slug);
   const inWatchlist = isInWatchlist(slug);
   const triviaData = movie.trivia;
-
-  const themeColor = categoryInfo.color;
-  const dynamicBackground = `radial-gradient(circle at top right, ${themeColor}22 0%, #0d0d11 60%)`;
 
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
@@ -323,7 +329,7 @@ export default function MovieDetail() {
           </div>
 
           <div className="jump-review-bar">
-            <a href="#comment-section" className="review-jump-btn" style={{ backgroundColor: themeColor }}>
+            <a href="#comment-section" className="review-jump-btn" style={{ backgroundColor: themeColor === '#f5c518' ? '#000' : '#fff'}}>
               <MessageSquare size={17} />
               <span>Yorumları Oku & İnceleme Yaz</span>
             </a>
