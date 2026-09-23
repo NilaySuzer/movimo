@@ -1,39 +1,14 @@
 import React , { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { comingSoonMovies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
 import '../styles/home.css';
 import { ArrowRight, Play, X} from 'lucide-react';
 import ActivityFeed from '../components/ActivityFeed';
 import MarqueeTicker from '../components/MarqueeTicker';
 import { useToast } from '../context/ToastContext';
-// 1. Hero Slider Verileri
-const featuredSlides = [
-  {
-    slug: 'dark-knight',
-    title: 'The Dark Knight',
-    category: 'Action',
-    tag: 'Must Watch',
-    bgImg: '/imgs/dk.png',
-    desc: 'When the menace known as the Joker wreaks havoc and chaos on Gotham, Batman must accept one of the greatest psychological and physical tests.'
-  },
-  {
-    slug: 'interstellar',
-    title: 'Interstellar',
-    category: 'Sci-Fi',
-    tag: 'Top Rated',
-    bgImg: '/imgs/interstelllar.png',
-    desc: 'A team of explorers travel through a wormhole in space in an attempt to ensure humanity survival across unknown galaxies.'
-  },
-  {
-    slug: 'corpse-bride',
-    title: 'Corpse Bride',
-    category: 'Animation',
-    tag: 'Classic',
-    bgImg: '/imgs/corpseb.png',
-    desc: 'When a shy groom practices his wedding vows in the inadvertent presence of a deceased young woman, she rises from the grave.'
-  }
-];
+
+
+
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +17,7 @@ const [newsletterEmail, setNewsletterEmail] = useState('');
 const { showToast } = useToast();
 // 1. API'den gelen filmleri tutacak state:
   const [movies, setMovies] = useState([]);
+  const heroSlides = movies.slice(0, 3); 
   const [comingSoonList, setComingSoonList] = useState([]);
 
   // 2. Sayfa açıldığında .NET API'den filmleri çek:
@@ -96,12 +72,16 @@ const { showToast } = useToast();
   };
 
   // Slider Otomasyonu
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev === featuredSlides.length - 1 ? 0 : prev + 1));
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
+ useEffect(() => {
+   if (!heroSlides || heroSlides.length === 0) return;
+ 
+   const timer = setInterval(() => {
+     setCurrentSlide((prev) => (prev + 1) % heroSlides.length); // 👈 Sonsuz döngüye sokan yer
+   }, 4000);
+ 
+   return () => clearInterval(interval(timer));
+ }, [heroSlides.length]);
+ 
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -180,18 +160,18 @@ const handleWatchTrailer = (movie) => {
     <div className="home-wrapper">
       {/* 1. HERO SLIDER */}
       <div className="hero-slider">
-        <button className="slider-arrow prev" onClick={() => setCurrentSlide(prev => (prev === 0 ? featuredSlides.length - 1 : prev - 1))}>❮</button>
-        <button className="slider-arrow next" onClick={() => setCurrentSlide(prev => (prev === featuredSlides.length - 1 ? 0 : prev + 1))}>❯</button>
+        <button className="slider-arrow prev" onClick={() => setCurrentSlide(prev => (prev === 0 ? heroSlides.length - 1 : prev - 1))}>❮</button>
+        <button className="slider-arrow next" onClick={() => setCurrentSlide(prev => (prev === heroSlides.length - 1 ? 0 : prev + 1))}>❯</button>
 
-        {featuredSlides.map((slide, index) => (
+        {heroSlides.map((slide, index) => (
           <div key={slide.slug} className={`slide ${index === currentSlide ? 'active' : ''}`}>
-            <img className="slide-img" src={slide.bgImg} alt={slide.title} />
+            <img className="slide-img" src={slide.poster} alt={slide.title} />
             <div className="slide-overlay">
               <span className="slide-badge">{slide.tag} • {slide.category}</span>
               <h2 className="slide-title">{slide.title}</h2>
               <p className="slide-desc">{slide.desc}</p>
               <Link to={`/movie/${slide.slug}`}>
-                <button className="search-btn">Review Movie</button>
+                <button className="search-btn">Filmi İncele</button>
               </Link>
             </div>
           </div>
