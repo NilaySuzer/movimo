@@ -358,25 +358,40 @@ const categoryInfo = categories.find(
       )}
 
       {/* OYUNCU LİSTESİ */}
-      <section className="cast-module-container">
-        <div className="section-header-title">
-          <Users size={24} color="#f5c518" />
-          <h2>Başrol Oyuncuları & Karakterler</h2>
-        </div>
-        <div className="cast-grid-large">
-          {castList.map((actor, idx) => (
-            <div key={idx} className="cast-card-large glass-panel">
-              <div className="cast-image-wrap">
-                <img src={actor.avatar} alt={actor.name} />
-              </div>
-              <div className="cast-info-large">
-                <strong className="actor-name">{actor.name}</strong>
-                <span className="character-name">{actor.role}</span>
-              </div>
+{((movie.cast && movie.cast.length > 0) || (typeof castList !== 'undefined' && castList?.length > 0)) && (
+  <section className="cast-module-container">
+    <div className="section-header-title">
+      <Users size={24} color="#f5c518" />
+      <h2>Başrol Oyuncuları & Karakterler</h2>
+    </div>
+    <div className="cast-grid-large">
+      {(movie.cast || castList).map((actor, idx) => {
+        // API (actorName, photoUrl, characterName) ve eski statik yapıyı (name, avatar, role) eşleştiriyoruz:
+        const name = actor.actorName || actor.name || 'Oyuncu';
+        const role = actor.characterName || actor.role || '';
+        const avatar = actor.photoUrl || actor.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+
+        return (
+          <div key={actor.id || idx} className="cast-card-large glass-panel">
+            <div className="cast-image-wrap">
+              <img 
+                src={avatar} 
+                alt={name}
+                onError={(e) => {
+                  e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                }}
+              />
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="cast-info-large">
+              <strong className="actor-name">{name}</strong>
+              <span className="character-name">{role}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </section>
+)}
 
       {/* PUAN DAĞILIMI */}
       <section className="community-rating-section glass-panel">

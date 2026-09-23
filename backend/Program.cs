@@ -36,37 +36,66 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// --- GEÇİCİ CAST SEED BAŞLANGICI ---
+// --- GÜNCEL VE SAĞLAM CAST SEED BAŞLANGICI ---
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<backend.Data.AppDbContext>();
 
-    if (!context.MovieCasts.Any())
+    // Varsa eski eksik cast verilerini temizleyelim ki çift kayıt olmasın
+    if (context.MovieCasts.Any())
     {
-        var casts = new List<backend.Models.MovieCast>
-        {
-            // Dark Knight (Id: 1)
-            new() { MovieId = 1, ActorName = "Christian Bale", CharacterName = "Bruce Wayne / Batman", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2381/cache-2965-1594982633/image-w856.jpg", DisplayOrder = 1 },
-            new() { MovieId = 1, ActorName = "Heath Ledger", CharacterName = "Joker", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2443/cache-3211-1594982937/image-w856.jpg", DisplayOrder = 2 },
-            new() { MovieId = 1, ActorName = "Gary Oldman", CharacterName = "Jim Gordon", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2436/cache-3204-1594982903/image-w856.jpg", DisplayOrder = 3 },
-            new() { MovieId = 1, ActorName = "Michael Caine", CharacterName = "Alfred", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2384/cache-2968-1594982645/image-w856.jpg", DisplayOrder = 4 },
-
-            // Corpse Bride (Id: 2)
-            new() { MovieId = 2, ActorName = "Johnny Depp", CharacterName = "Victor Van Dort (Voice)", PhotoUrl = "https://images.mubicdn.net/images/cast_member/1344/cache-2559-1594980649/image-w856.jpg", DisplayOrder = 1 },
-            new() { MovieId = 2, ActorName = "Helena Bonham Carter", CharacterName = "Emily (Voice)", PhotoUrl = "https://images.mubicdn.net/images/cast_member/1376/cache-2591-1594980807/image-w856.jpg", DisplayOrder = 2 },
-            new() { MovieId = 2, ActorName = "Emily Watson", CharacterName = "Victoria Everglot (Voice)", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2704/cache-3472-1594984242/image-w856.jpg", DisplayOrder = 3 },
-
-            // 3. Film (Id: 3)
-            new() { MovieId = 3, ActorName = "Matthew McConaughey", CharacterName = "Cooper", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2453/cache-3221-1594982987/image-w856.jpg", DisplayOrder = 1 },
-            new() { MovieId = 3, ActorName = "Anne Hathaway", CharacterName = "Brand", PhotoUrl = "https://images.mubicdn.net/images/cast_member/2448/cache-3216-1594982962/image-w856.jpg", DisplayOrder = 2 }
-        };
-
-        context.MovieCasts.AddRange(casts);
+        context.MovieCasts.RemoveRange(context.MovieCasts);
         context.SaveChanges();
-        Console.WriteLine(">>> CAST VERİLERİ BAŞARIYLA EKLENDİ! <<<");
+    }
+
+    // Filmleri başlıklarına göre bulalım (ID bağımsız garanti çözüm):
+    var darkKnight = context.Movies.FirstOrDefault(m => m.Title.Contains("Dark Knight"));
+    var corpseBride = context.Movies.FirstOrDefault(m => m.Title.Contains("Corpse Bride"));
+    var interstellar = context.Movies.FirstOrDefault(m => m.Title.Contains("Interstellar"));
+
+    var newCasts = new List<backend.Models.MovieCast>();
+
+    // 1. The Dark Knight
+    if (darkKnight != null)
+    {
+        newCasts.AddRange(new[]
+        {
+            new backend.Models.MovieCast { MovieId = darkKnight.Id, ActorName = "Christian Bale", CharacterName = "Bruce Wayne / Batman", PhotoUrl = "https://image.tmdb.org/t/p/w300/b7fTC9WFkgqGOv77mLQ0ig0XqWb.jpg", DisplayOrder = 1 },
+            new backend.Models.MovieCast { MovieId = darkKnight.Id, ActorName = "Heath Ledger", CharacterName = "Joker", PhotoUrl = "https://image.tmdb.org/t/p/w300/5Y9HnYYa9jF4NuY9lENFyWRJHJW.jpg", DisplayOrder = 2 },
+            new backend.Models.MovieCast { MovieId = darkKnight.Id, ActorName = "Gary Oldman", CharacterName = "Jim Gordon", PhotoUrl = "https://image.tmdb.org/t/p/w300/2v9Fs9fvnDcPr2m0vMGz6CCgP9n.jpg", DisplayOrder = 3 },
+            new backend.Models.MovieCast { MovieId = darkKnight.Id, ActorName = "Michael Caine", CharacterName = "Alfred Pennyworth", PhotoUrl = "https://image.tmdb.org/t/p/w300/bV3Zv5T2vE1w6Z8H9YQ5X8n1.jpg", DisplayOrder = 4 }
+        });
+    }
+
+    // 2. Corpse Bride
+    if (corpseBride != null)
+    {
+        newCasts.AddRange(new[]
+        {
+            new backend.Models.MovieCast { MovieId = corpseBride.Id, ActorName = "Johnny Depp", CharacterName = "Victor Van Dort (Ses)", PhotoUrl = "https://image.tmdb.org/t/p/w300/il7m2rZ4bZl99zZ4bZl99zZ4bZl.jpg", DisplayOrder = 1 },
+            new backend.Models.MovieCast { MovieId = corpseBride.Id, ActorName = "Helena Bonham Carter", CharacterName = "Emily - Corpse Bride (Ses)", PhotoUrl = "https://image.tmdb.org/t/p/w300/DDeITcCpnBd0qNXDef1S5Msl7z.jpg", DisplayOrder = 2 },
+            new backend.Models.MovieCast { MovieId = corpseBride.Id, ActorName = "Emily Watson", CharacterName = "Victoria Everglot (Ses)", PhotoUrl = "https://image.tmdb.org/t/p/w300/bd0qNXDef1S5Msl7zDDeITcCpn.jpg", DisplayOrder = 3 }
+        });
+    }
+
+    // 3. Interstellar
+    if (interstellar != null)
+    {
+        newCasts.AddRange(new[]
+        {
+            new backend.Models.MovieCast { MovieId = interstellar.Id, ActorName = "Matthew McConaughey", CharacterName = "Cooper", PhotoUrl = "https://image.tmdb.org/t/p/w300/wDeITcCpnBd0qNXDef1S5Msl7z.jpg", DisplayOrder = 1 },
+            new backend.Models.MovieCast { MovieId = interstellar.Id, ActorName = "Anne Hathaway", CharacterName = "Brand", PhotoUrl = "https://image.tmdb.org/t/p/w300/tL9EnYRhUgJq0n0UfO2R1a0o5E.jpg", DisplayOrder = 2 }
+        });
+    }
+
+    if (newCasts.Any())
+    {
+        context.MovieCasts.AddRange(newCasts);
+        context.SaveChanges();
+        Console.WriteLine($">>> TOPLAM {newCasts.Count} OYUNCU BAŞARIYLA GÜNCELLENDİ! <<<");
     }
 }
-// --- GEÇİCİ CAST SEED BİTİŞİ ---
+// --- GÜNCEL VE SAĞLAM CAST SEED BİTİŞİ ---
 
 
 app.Run();
