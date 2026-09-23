@@ -36,12 +36,42 @@ public class MoviesController : ControllerBase
         return Ok(movies);
     }
 
+    // POST: api/movies/5/cast
+    [HttpPost("{movieId}/cast")]
+    public async Task<ActionResult<MovieCast>> AddCastMember(int movieId, [FromBody] MovieCast castMember)
+    {
+        var movie = await _context.Movies.FindAsync(movieId);
+        if (movie == null) return NotFound("Film bulunamadı.");
+
+        castMember.MovieId = movieId;
+        _context.MovieCasts.Add(castMember);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetMovie), new { id = movieId }, castMember);
+    }
+
+    // DELETE: api/movies/cast/12
+    [HttpDelete("cast/{castId}")]
+    public async Task<IActionResult> DeleteCastMember(int castId)
+    {
+        var cast = await _context.MovieCasts.FindAsync(castId);
+        if (cast == null) return NotFound();
+
+        _context.MovieCasts.Remove(cast);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+
     // GET: api/movies/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Movie>> GetMovie(int id)
     {
         var movie = await _context.Movies.FindAsync(id);
-
+        movie = await _context.Movies
+            .Include(m => m.Cast.OrderBy(c => c.DisplayOrder)) // 👈 Cast sıralı olarak filme dahil edildi
+            .FirstOrDefaultAsync(m => m.Id == id);
         if (movie == null)
         {
             return NotFound(new { message = "Film bulunamadı." });

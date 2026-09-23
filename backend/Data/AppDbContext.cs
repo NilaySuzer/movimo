@@ -13,12 +13,18 @@ public class AppDbContext : DbContext
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<PollOption> PollOptions => Set<PollOption>();
 
+    public DbSet<MovieCast> MovieCasts { get; set; }
+
     public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
     public DbSet<MovieTrivia> MovieTrivias => Set<MovieTrivia>();
     public DbSet<UserInteraction> UserInteractions => Set<UserInteraction>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<MovieCast>()
+              .HasOne(c => c.Movie)
+              .WithMany(m => m.Cast)
+              .HasForeignKey(c => c.MovieId);
 
         // Başlangıç anket seçenekleri
         modelBuilder.Entity<PollOption>().HasData(

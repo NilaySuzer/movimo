@@ -20,6 +20,9 @@ public class Movie
 
     public string? TrailerUrl { get; set; }
 
+    // Movie.cs içine eklenecek satır:
+    public virtual ICollection<MovieCast> Cast { get; set; } = new List<MovieCast>();
+
     public string? Summary { get; set; }
     public string Category { get; set; } = "general"; public bool IsComingSoon { get; set; } = false;
     public string? ReleaseDateText { get; set; }
