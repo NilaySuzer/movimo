@@ -79,7 +79,7 @@ const { showToast } = useToast();
      setCurrentSlide((prev) => (prev + 1) % heroSlides.length); // 👈 Sonsuz döngüye sokan yer
    }, 4000);
  
-   return () => clearInterval(interval(timer));
+   return () => clearInterval(timer);
  }, [heroSlides.length]);
  
 

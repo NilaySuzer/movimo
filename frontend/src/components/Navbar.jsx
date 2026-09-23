@@ -22,11 +22,10 @@ import {
     Globe,
   LogIn
 } from 'lucide-react';
-import { movies } from '../data/moviesData';
 import { categories } from '../data/categoriesData';
+import { useMovies } from '../context/MovieContext';
 import QuickReviewModal from './QuickReviewModal';
 import '../styles/navbar.css';
-import { useMovies } from '../context/MovieContext';
 import AuthModal from './AuthModal';
 
 const moodList = [
@@ -46,12 +45,43 @@ export default function Navbar() {
     const { watchlist, currentUser, logout } = useMovies(); // currentUser ve logout aldık
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Arama State'leri
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
+  const { movies } = useMovies(); // 👈 Doğrudan API filmleri
+  const [apiMovies, setApiMovies] = useState([]);
+
   const navRef = useRef(null);
   const searchRef = useRef(null);
+
+  // 1. Veritabanındaki tüm filmleri API'den çek
+  useEffect(() => {
+    fetch('http://localhost:5080/api/movies')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setApiMovies(data))
+      .catch((err) => console.error('Arama için filmler alınamadı:', err));
+  }, []);
+
+  // 2. Arama çubuğunun dışına tıklandığında dropdown'ı kapat
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 3. API'den gelen filmleri başlık, yönetmen veya kategoriye göre filtrele
+  const filteredMovies = searchTerm.trim() === ''
+    ? []
+    : movies.filter((movie) => {
+        const query = searchTerm.toLowerCase();
+        const titleMatch = movie.title?.toLowerCase().includes(query);
+        const directorMatch = movie.director?.toLowerCase().includes(query);
+        const categoryMatch = movie.category?.toLowerCase().includes(query);
+        return titleMatch || directorMatch || categoryMatch;
+      });
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -90,16 +120,11 @@ export default function Navbar() {
     }
   }, [cinemaMode]);
 
-  const filteredMovies = searchTerm.trim()
-    ? movies.filter((m) =>
-        m.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
 
   const handleRandomMovie = () => {
     closeAll();
-    const randomIndex = Math.floor(Math.random() * movies.length);
-    const randomMovie = movies[randomIndex];
+    const randomIndex = Math.floor(Math.random() * apiMovies.length);
+    const randomMovie = apiMovies[randomIndex];
     if (randomMovie) {
       navigate(`/movie/${randomMovie.slug}`);
     }
@@ -130,7 +155,7 @@ export default function Navbar() {
               <input
                 className="nav-search-input"
                 type="search"
-                placeholder={lang === 'TR' ? 'Film ara...' : 'Search movie...'}
+                placeholder={lang === 'TR' ? 'Film, yönetmen veya tür ara...' : 'Search movie, director or genre...'}
                 value={searchTerm}
                 onFocus={() => setIsSearchOpen(true)}
                 onChange={(e) => {
@@ -145,18 +170,24 @@ export default function Navbar() {
                 {filteredMovies.length > 0 ? (
                   filteredMovies.map((movie) => (
                     <Link
-                      key={movie.slug}
-                      to={`/movie/${movie.slug}`}
+                      key={movie.id}
+                      to={`/movie/${movie.id}`}
                       className="search-result-item"
                       onClick={() => {
                         setSearchTerm('');
                         setIsSearchOpen(false);
                       }}
                     >
-                      <img src={movie.poster} alt={movie.title} className="search-result-img" />
+                      <img 
+                        src={movie.posterUrl || '/imgs/default.png'} 
+                        alt={movie.title} 
+                        className="search-result-img" 
+                      />
                       <div className="search-result-info">
                         <div className="search-result-title">{movie.title}</div>
-                        <span className="search-result-meta">IMDb: {movie.imdb || 'N/A'}</span>
+                        <span className="search-result-meta">
+                          {movie.releaseYear || '2024'} • {movie.director || 'Yönetmen'} • Puan: {movie.averageRating || '8.5'}
+                        </span>
                       </div>
                     </Link>
                   ))

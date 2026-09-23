@@ -3,7 +3,28 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const MovieContext = createContext();
 
 export function MovieProvider({ children }) {
-  // 1. Kullanıcı State'i (Auth backend'e taşınana kadar hazır duruyor)
+  // 1. API'den Gelen Filmler (Merkezi State)
+  const [movies, setMovies] = useState([]);
+  const [loadingMovies, setLoadingMovies] = useState(true);
+
+  const fetchMovies = () => {
+    fetch('http://localhost:5080/api/movies')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        setMovies(data);
+        setLoadingMovies(false);
+      })
+      .catch((err) => {
+        console.error('Filmler API hatası:', err);
+        setLoadingMovies(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchMovies();
+  }, []);
+
+  // 2. Kullanıcı State'i
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem('movie_current_user');
     return savedUser ? JSON.parse(savedUser) : {
@@ -17,11 +38,11 @@ export function MovieProvider({ children }) {
       followers: 328,
       following: 195,
       isLoggedIn: true,
-      pinnedFavorites: ['dark-knight', 'interstellar', 'corpse-bride', 'matrix']
+      pinnedFavorites: ['1', '2', '3', '4']
     };
   });
 
-  // Özel kullanıcı listeleri state'i
+  // 3. Özel Kullanıcı Listeleri State'i (Filmler ID ile tutulur)
   const [customLists, setCustomLists] = useState(() => {
     const saved = localStorage.getItem('cinenest_custom_lists');
     return saved ? JSON.parse(saved) : [
@@ -29,18 +50,12 @@ export function MovieProvider({ children }) {
         id: 'list-1', 
         title: 'Gece Kuşağı & Zihin Bükücüler', 
         description: 'Gece yarısı izlenmesi gereken atmosferik yapımlar.',
-        movieSlugs: ['inception', 'fight-club', 'interstellar'] 
-      },
-      { 
-        id: 'list-2', 
-        title: 'Hafta Sonu Neşesi', 
-        description: 'Kafayı dağıtmalık, hafif ve keyifli filmler.',
-        movieSlugs: ['amelie', 'spirited-away'] 
+        movieSlugs: ['1', '2'] 
       }
     ];
   });
 
-  // 2. MSSQL Backend Senkronizasyonlu Etkileşimler
+  // 4. MSSQL Backend Senkronizasyonlu Etkileşimler
   const [interactions, setInteractions] = useState([]);
   const activeUserId = 'default_user';
 
@@ -109,14 +124,14 @@ export function MovieProvider({ children }) {
     }
   };
 
-  // Özel liste metodları
-  const createCustomList = (title, description = '') => {
+  // Özel liste metodları (Seçilen film ID'lerini de alabilir)
+  const createCustomList = (title, description = '', selectedIds = []) => {
     if (!title.trim()) return;
     const newList = {
       id: `list-${Date.now()}`,
       title: title.trim(),
       description: description.trim(),
-      movieSlugs: []
+      movieSlugs: selectedIds.map(String) // ID'leri dizi olarak sakla
     };
     const updated = [newList, ...customLists];
     setCustomLists(updated);
@@ -129,13 +144,14 @@ export function MovieProvider({ children }) {
     localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
   };
 
-  const toggleMovieInList = (listId, movieSlug) => {
+  const toggleMovieInList = (listId, movieSlugOrId) => {
+    const idStr = movieSlugOrId.toString();
     const updated = customLists.map((list) => {
       if (list.id === listId) {
-        const exists = list.movieSlugs.includes(movieSlug);
+        const exists = list.movieSlugs.includes(idStr);
         const newSlugs = exists
-          ? list.movieSlugs.filter((s) => s !== movieSlug)
-          : [...list.movieSlugs, movieSlug];
+          ? list.movieSlugs.filter((s) => s !== idStr)
+          : [...list.movieSlugs, idStr];
         return { ...list, movieSlugs: newSlugs };
       }
       return list;
@@ -144,7 +160,7 @@ export function MovieProvider({ children }) {
     localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
   };
 
-  // 3. Kullanıcı İncelemeleri State'i
+  // Kullanıcı İncelemeleri State'i
   const [userReviews, setUserReviews] = useState(() => {
     const saved = localStorage.getItem('movie_user_reviews');
     return saved ? JSON.parse(saved) : [];
@@ -260,6 +276,9 @@ export function MovieProvider({ children }) {
   return (
     <MovieContext.Provider
       value={{
+        movies,              // 👈 TÜM UYGULAMA İÇİN API FİLMLERİ
+        loadingMovies,
+        fetchMovies,
         currentUser,
         updateProfile,
         followingList,
@@ -279,7 +298,11 @@ export function MovieProvider({ children }) {
         addReview,
         deleteReview,
         isInWatchlist,
-        isMovieLiked
+        isMovieLiked,
+        lang,
+        setLang,
+        cinemaMode,
+        setCinemaMode
       }}
     >
       {children}
