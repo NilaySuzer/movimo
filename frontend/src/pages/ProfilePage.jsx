@@ -33,7 +33,7 @@ export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [followModalTab, setFollowModalTab] = useState('followers');
-  
+  const [selectedMovieIds, setSelectedMovieIds] = useState([]);
   // API'den dinamik çekilen filmler ve kullanıcının veritabanı incelemeleri
   const [dbMovies, setDbMovies] = useState([]);
   const [dbUserReviews, setDbUserReviews] = useState([]);
@@ -78,16 +78,19 @@ export default function ProfilePage() {
   }, [currentUser]);
 
   // Yeni Liste Oluşturma
-  const handleCreateList = (e) => {
-    e.preventDefault();
-    if (!newListTitle.trim()) return;
-    
-    createCustomList(newListTitle, newListDesc);
-    setNewListTitle('');
-    setNewListDesc('');
-    setIsModalOpen(false);
-    showToast('Yeni sinema listeniz oluşturuldu! 🎬', 'success');
-  };
+const handleCreateList = (e) => {
+  e.preventDefault();
+  if (!newListTitle.trim()) return;
+
+  // Başlık, açıklama ve seçilen filmleri gönderiyoruz:
+  createCustomList(newListTitle, newListDesc, selectedMovieIds);
+  
+  setNewListTitle('');
+  setNewListDesc('');
+  setSelectedMovieIds([]);
+  setIsModalOpen(false);
+  showToast('Yeni sinema listeniz oluşturuldu! 🎬', 'success');
+};
 
   const handleDeleteList = (listId, listTitle) => {
     if (window.confirm(`"${listTitle}" listesini silmek istediğinize emin misiniz?`)) {
@@ -396,6 +399,56 @@ export default function ProfilePage() {
                   ></textarea>
                 </div>
 
+                <div className="form-group">
+  <label style={{ display: 'block', marginBottom: '8px', color: '#f5c518', fontSize: '0.9rem' }}>
+    Listeye Film Ekle ({selectedMovieIds.length} seçildi):
+  </label>
+  <div style={{
+    maxHeight: '160px',
+    overflowY: 'auto',
+    background: 'rgba(0,0,0,0.4)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    padding: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  }}>
+    {dbMovies.map((film) => {
+      const isChecked = selectedMovieIds.includes(film.id.toString());
+      return (
+        <label 
+          key={film.id} 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            cursor: 'pointer',
+            fontSize: '0.85rem',
+            color: isChecked ? '#fff' : '#aaa'
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={(e) => {
+              const idStr = film.id.toString();
+              if (e.target.checked) {
+                setSelectedMovieIds(prev => [...prev, idStr]);
+              } else {
+                setSelectedMovieIds(prev => prev.filter(id => id !== idStr));
+              }
+            }}
+            style={{ accentColor: '#f5c518' }}
+          />
+          <span>{film.title} ({film.releaseYear || '2024'})</span>
+        </label>
+      );
+    })}
+  </div>
+</div>
+
+                
                 <div className="modal-actions">
                   <button 
                     type="button" 
