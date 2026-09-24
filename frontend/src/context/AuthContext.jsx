@@ -17,8 +17,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    const mergedUser = { ...user, ...userData };
+    setUser(mergedUser);
+    localStorage.setItem('user', JSON.stringify(mergedUser));
   };
 
   const logout = () => {

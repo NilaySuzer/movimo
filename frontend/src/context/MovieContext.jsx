@@ -85,39 +85,40 @@ export function MovieProvider({ children }) {
       .catch((err) => console.error('Etkileşimler API hatası:', err));
   }, [user]);
 
-  // 3. MSSQL Backend Etkileşimleri (Watchlist & Likes) - LocalStorage Yedekli
- const [interactions, setInteractions] = useState(() => {
-
+  // MSSQL Backend Etkileşimleri (Watchlist & Likes) - LocalStorage Kalıcılık Garantili
+  const [interactions, setInteractions] = useState(() => {
     const savedUser = localStorage.getItem('user');
-
     if (!savedUser) return [];
-
     try {
-
-      const uId = JSON.parse(savedUser).id;
-
-      const saved = localStorage.getItem(`interactions_${uId}`);
-
+      const uId = JSON.parse(savedUser).id || JSON.parse(savedUser).username;
+      const saved = localStorage.getItem(`cinenest_interactions_${uId}`);
       return saved ? JSON.parse(saved) : [];
-
     } catch {
-
       return [];
-
     }
-
   });
 
   useEffect(() => {
-    if (!user?.id) {
+    if (!user) {
       setInteractions([]);
       return;
     }
-    fetch(`http://localhost:5080/api/interactions/user/${user.id}`)
+    const uId = user.id || user.username;
+    
+    // Önce varsa yerel depolamadan hızlıca yükle ki boş görünmesin
+    const localSaved = localStorage.getItem(`cinenest_interactions_${uId}`);
+    if (localSaved) {
+      try { setInteractions(JSON.parse(localSaved)); } catch {}
+    }
+
+    // Sonra backend'den güncel veriyi çek ve eşitle
+    fetch(`http://localhost:5080/api/interactions/user/${uId}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
-        setInteractions(data);
-        localStorage.setItem(`interactions_${user.id}`, JSON.stringify(data));
+        if (data && data.length > 0) {
+          setInteractions(data);
+          localStorage.setItem(`cinenest_interactions_${uId}`, JSON.stringify(data));
+        }
       })
       .catch((err) => console.error('Etkileşimler API hatası:', err));
   }, [user]);
@@ -149,10 +150,13 @@ export function MovieProvider({ children }) {
         const data = await res.json();
         setInteractions((prev) => {
           const exists = prev.some((i) => i.movieId === movieId);
-          if (exists) {
-            return prev.map((i) => (i.movieId === movieId ? { ...i, isInWatchlist: data.isInWatchlist } : i));
-          }
-          return [...prev, { movieId, isLiked: false, isInWatchlist: data.isInWatchlist }];
+          const updated = exists
+            ? prev.map((i) => (i.movieId === movieId ? { ...i, isInWatchlist: data.isInWatchlist } : i))
+            : [...prev, { movieId, isLiked: false, isInWatchlist: data.isInWatchlist }];
+          
+          // localStorage'a güncel diziyi burada mühürlüyoruz
+          localStorage.setItem(`cinenest_interactions_${user.id || user.username}`, JSON.stringify(updated));
+          return updated;
         });
       }
     } catch (err) {
@@ -173,10 +177,13 @@ export function MovieProvider({ children }) {
         const data = await res.json();
         setInteractions((prev) => {
           const exists = prev.some((i) => i.movieId === movieId);
-          if (exists) {
-            return prev.map((i) => (i.movieId === movieId ? { ...i, isLiked: data.isLiked } : i));
-          }
-          return [...prev, { movieId, isLiked: data.isLiked, isInWatchlist: false }];
+          const updated = exists
+            ? prev.map((i) => (i.movieId === movieId ? { ...i, isLiked: data.isLiked } : i))
+            : [...prev, { movieId, isLiked: data.isLiked, isInWatchlist: false }];
+          
+          // localStorage'a güncel diziyi burada mühürlüyoruz
+          localStorage.setItem(`cinenest_interactions_${user.id || user.username}`, JSON.stringify(updated));
+          return updated;
         });
       }
     } catch (err) {
