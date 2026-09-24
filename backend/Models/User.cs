@@ -21,14 +21,14 @@ public class User
     [MaxLength(100)]
     public string FullName { get; set; } = string.Empty;
 
-    [MaxLength(500)]
+    [MaxLength]
     public string AvatarUrl { get; set; } = string.Empty;
 
-    [MaxLength(500)]
+    [MaxLength]
     public string BannerUrl { get; set; } = string.Empty;
 
     public string Bio { get; set; } = string.Empty;
-
+    public string? PinnedFavorites { get; set; }
     [MaxLength(20)]
     public string Role { get; set; } = "User"; // "User" veya "Admin"
 

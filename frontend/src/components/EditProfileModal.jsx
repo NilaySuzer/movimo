@@ -3,13 +3,14 @@ import { X, Save, Image, Film, User, Upload } from 'lucide-react';
 import { useAuth } from '../context/AuthContext'; // 👈 Gerçek Auth Context
 import { useMovies } from '../context/MovieContext'; // 👈 Sadece filmler için
 import { useToast } from '../context/ToastContext';
+import axios from 'axios';
 import '../styles/editProfile.css';
 
 export default function EditProfileModal({ isOpen, onClose }) {
-  const { user, login } = useAuth(); // 👈 Gerçek aktif kullanıcı ve oturum güncelleme fonksiyonu
+  const { user, login } = useAuth(); 
   const { movies } = useMovies(); 
   const { showToast } = useToast();
-
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -58,28 +59,39 @@ export default function EditProfileModal({ isOpen, onClose }) {
     setPinned(newPinned);
   };
 
-  const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Güncellenmiş kullanıcı objesini oluşturuyoruz
-    const updatedUser = {
-      ...user,
-      fullName: name.trim(),
-      name: name.trim(),
-      username: username.trim().startsWith('@') ? username.trim() : `@${username.trim()}`,
-      bio: bio.trim(),
-      avatarUrl: avatar.trim(),
-      avatar: avatar.trim(),
-      bannerUrl: banner.trim(),
-      banner: banner.trim(),
-      pinnedFavorites: pinned
-    };
+    setLoading(true);
 
-    // AuthContext ve localStorage'ı güncelliyoruz
-    login(updatedUser);
-    
-    showToast('Profilin başarıyla güncellendi! ✨', 'success');
-    onClose();
+    try {
+      const payload = {
+        fullName: name.trim(),
+        username: username.trim().startsWith('@') ? username.trim() : `@${username.trim()}`,
+        bio: bio.trim(),
+        avatarUrl: avatar.trim(),
+        bannerUrl: banner.trim(),
+        pinnedFavorites: pinned.filter(Boolean).join(',')
+      };
+
+      const res = await axios.put(`http://localhost:5080/api/auth/${user.id}`, payload);
+
+      if (res.status === 200) {
+        const updatedUser = {
+          ...user,
+          ...res.data,
+          pinnedFavorites: res.data.pinnedFavorites ? res.data.pinnedFavorites.split(',').filter(Boolean) : pinned
+        };
+
+        login(updatedUser);
+        showToast('Profiliniz kaydedildi! ✨', 'success');
+        onClose();
+      }
+    } catch (err) {
+      console.error('Profil kaydedilemedi:', err);
+      showToast('Veritabanına kaydedilirken bir hata oluştu.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -91,9 +91,30 @@ public class AuthController : ControllerBase
                 user.Email,
                 user.FullName,
                 user.AvatarUrl,
+                user.BannerUrl,
+                user.PinnedFavorites,
                 user.Bio,
                 user.Role
             }
         });
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto dto)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound(new { message = "Kullanıcı bulunamadı." });
+
+        // Sadece adı değil, tüm profil detaylarını veritabanına mühürlüyoruz:
+        user.FullName = dto.FullName ?? user.FullName;
+        user.Username = dto.Username ?? user.Username;
+        user.Bio = dto.Bio;
+        user.AvatarUrl = dto.AvatarUrl;
+        user.BannerUrl = dto.BannerUrl;
+        user.PinnedFavorites = dto.PinnedFavorites;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(user);
     }
 }

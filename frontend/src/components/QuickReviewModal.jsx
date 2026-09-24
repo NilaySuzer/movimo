@@ -6,6 +6,7 @@ import '../styles/modal.css';
 
 export default function QuickReviewModal({ isOpen, onClose, lang, onReviewAdded }) {
   const { movies } = useMovies();
+  const { user } = useAuth();
   const [selectedMovieId, setSelectedMovieId] = useState('');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -14,7 +15,7 @@ export default function QuickReviewModal({ isOpen, onClose, lang, onReviewAdded 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
-const { user } = useAuth();
+
   const handleSubmit = async (e) => {
   e.preventDefault();
   if (!selectedMovieId || !comment.trim() || isSubmitting) return;

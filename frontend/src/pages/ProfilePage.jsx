@@ -117,8 +117,13 @@ export default function ProfilePage() {
   const watchlistMovies = dbMovies.filter((m) => watchlist.map(String).includes(m.id.toString()));
   const likedMoviesList = dbMovies.filter((m) => likedMovies.map(String).includes(m.id.toString()));
 
-  // Kullanıcının pinlediği filmler (EditProfileModal'da seçilenler)
-  const pinnedMovieIds = user.pinnedFavorites && user.pinnedFavorites.length > 0 ? user.pinnedFavorites.map(String) : [];
+ // 1. Veritabanından gelen string ("1,3,5") veya dizi halindeki veriyi güvenle array'e çeviriyoruz:
+  const pinnedFavoritesArray = typeof user?.pinnedFavorites === 'string'
+    ? user.pinnedFavorites.split(',').filter(Boolean)
+    : (Array.isArray(user?.pinnedFavorites) ? user.pinnedFavorites : []);
+
+  // 2. Artık .map() yerine güvenli dizimizi String'e çevirip kullanabiliriz:
+  const pinnedMovieIds = pinnedFavoritesArray.map(String);
   const pinnedList = dbMovies.filter((m) => pinnedMovieIds.includes(m.id.toString()));
 
   const handleDeleteReview = async (id) => {
