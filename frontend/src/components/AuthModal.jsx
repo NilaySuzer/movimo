@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { X, Mail, Lock, User, Clapperboard, ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { useMovies } from '../context/MovieContext';
+import axios from 'axios';
 import '../styles/auth.css';
 
-export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
+const API_URL = 'http://localhost:5080/api';
+
+export default function AuthModal({ isOpen, onClose, initialMode = 'login', onAuthSuccess }) {
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [showPassword, setShowPassword] = useState(false);
 
@@ -11,21 +13,59 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const { login, register } = useMovies();
+  
+  // Hata ve Yüklenme State'leri
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (mode === 'login') {
-      if (!email || !password) return;
-      login(email, password);
-      onClose();
-    } else {
-      if (!name || !email || !password) return;
-      register(name, email, password);
-      onClose();
+    setError('');
+    setLoading(true);
+
+    try {
+      if (mode === 'login') {
+        if (!email || !password) {
+          setError('Lütfen tüm alanları doldurun.');
+          setLoading(false);
+          return;
+        }
+
+        // Backend Login API İsteği
+        const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+        
+        if (response.data.user) {
+          // Kullanıcı bilgisini localStorage'a kaydedelim
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          if (onAuthSuccess) onAuthSuccess(response.data.user);
+        }
+        
+        setLoading(false);
+        onClose();
+      } else {
+        if (!name || !email || !password) {
+          setError('Lütfen tüm alanları doldurun.');
+          setLoading(false);
+          return;
+        }
+
+        // Backend Register API İsteği
+        await axios.post(`${API_URL}/auth/register`, {
+          username: name.toLowerCase().replace(/\s+/g, ''),
+          fullName: name,
+          email,
+          password
+        });
+
+        setLoading(false);
+        alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+        setMode('login'); // Kayıttan sonra giriş sekmesine atalım
+      }
+    } catch (err) {
+      setLoading(false);
+      setError(err.response?.data?.message || 'Bir hata oluştu, lütfen tekrar deneyin.');
     }
   };
 
@@ -50,19 +90,26 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
           </p>
         </div>
 
+        {/* Hata Mesajı Alanı */}
+        {error && (
+          <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#f87171', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '16px', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
+
         {/* Sekmeler (Tabs) */}
         <div className="auth-tabs">
           <button 
             type="button" 
             className={`auth-tab-btn ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => setMode('login')}
+            onClick={() => { setMode('login'); setError(''); }}
           >
             Giriş Yap
           </button>
           <button 
             type="button" 
             className={`auth-tab-btn ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => setMode('register')}
+            onClick={() => { setMode('register'); setError(''); }}
           >
             Kayıt Ol
           </button>
@@ -104,7 +151,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
             <div className="label-row">
               <label>Şifre</label>
               {mode === 'login' && (
-                <a href="#forgot" onClick={(e) => { e.preventDefault(); alert("Şifre sıfırlama bağlantısı gönderildi!"); }} className="forgot-link">
+                <a href="#forgot" onClick={(e) => { e.preventDefault(); alert("Şifre sıfırlama yakında aktif olacak!"); }} className="forgot-link">
                   Şifremi Unuttum?
                 </a>
               )}
@@ -128,9 +175,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
             </div>
           </div>
 
-          <button type="submit" className="auth-submit-btn">
-            <span>{mode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}</span>
-            <ArrowRight size={18} />
+          <button type="submit" className="auth-submit-btn" disabled={loading}>
+            <span>{loading ? 'İşleniyor...' : (mode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur')}</span>
+            {!loading && <ArrowRight size={18} />}
           </button>
         </form>
 
@@ -139,14 +186,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
           {mode === 'login' ? (
             <p>
               Hesabın yok mu?{' '}
-              <button type="button" className="switch-link" onClick={() => setMode('register')}>
+              <button type="button" className="switch-link" onClick={() => { setMode('register'); setError(''); }}>
                 Hemen Kaydol
               </button>
             </p>
           ) : (
             <p>
               Zaten üye misin?{' '}
-              <button type="button" className="switch-link" onClick={() => setMode('login')}>
+              <button type="button" className="switch-link" onClick={() => { setMode('login'); setError(''); }}>
                 Giriş Yap
               </button>
             </p>
