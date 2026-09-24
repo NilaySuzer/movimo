@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { X, Star, Film } from 'lucide-react';
 import { useMovies } from '../context/MovieContext';
+import { useAuth } from '../context/AuthContext';
 import '../styles/modal.css';
 
 export default function QuickReviewModal({ isOpen, onClose, lang, onReviewAdded }) {
-  const { movies, currentUser } = useMovies(); // 👈 API filmleri ve aktif kullanıcı
+  const { movies } = useMovies();
   const [selectedMovieId, setSelectedMovieId] = useState('');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -13,50 +14,53 @@ export default function QuickReviewModal({ isOpen, onClose, lang, onReviewAdded 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
-
+const { user } = useAuth();
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedMovieId || !comment.trim() || isSubmitting) return;
+  e.preventDefault();
+  if (!selectedMovieId || !comment.trim() || isSubmitting) return;
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    const payload = {
-      movieId: parseInt(selectedMovieId, 10),
-      user: currentUser?.name || 'Nilay Süzer',
-      comment: comment.trim(),
-      rating: Number(rating),
-      isSpoiler: Boolean(isSpoiler),
-      upvotes: 0
-    };
+  // Aktif kullanıcının adını/username'ini güvenli şekilde alıyoruz
+  const authorName = user?.fullName || user?.name || user?.username || 'Sinemasever';
 
-    try {
-      const res = await fetch('http://localhost:5080/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Yorum kaydedilemedi');
-
-      alert(lang === 'TR' ? 'İncelemeniz başarıyla paylaşıldı! 🎬' : 'Review posted successfully! 🎬');
-      
-      // Profil sayfasındaki yorum listesini anında tetikle/yenile
-      if (typeof onReviewAdded === 'function') {
-        onReviewAdded();
-      }
-
-      setSelectedMovieId('');
-      setComment('');
-      setRating(5);
-      setIsSpoiler(false);
-      onClose();
-    } catch (err) {
-      console.error('İnceleme ekleme hatası:', err);
-      alert(lang === 'TR' ? 'İnceleme kaydedilirken sunucu hatası oluştu.' : 'Failed to submit review.');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const payload = {
+    movieId: parseInt(selectedMovieId, 10),
+    author: authorName, 
+    user: authorName, 
+    comment: comment.trim(),
+    rating: Number(rating),
+    isSpoiler: Boolean(isSpoiler),
+    upvotes: 0
   };
+
+  try {
+    const res = await fetch('http://localhost:5080/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('Yorum kaydedilemedi');
+
+    alert(lang === 'TR' ? 'İncelemeniz başarıyla paylaşıldı! 🎬' : 'Review posted successfully! 🎬');
+    
+    if (typeof onReviewAdded === 'function') {
+      onReviewAdded();
+    }
+
+    setSelectedMovieId('');
+    setComment('');
+    setRating(5);
+    setIsSpoiler(false);
+    onClose();
+  } catch (err) {
+    console.error('İnceleme ekleme hatası:', err);
+    alert(lang === 'TR' ? 'İnceleme kaydedilirken sunucu hatası oluştu.' : 'Failed to submit review.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
