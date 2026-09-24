@@ -10,7 +10,7 @@ import {
   Trash2, 
   Calendar,
   Share2,
-  Search,       
+  Search,     
   UserPlus,    
   UserCheck, 
   Sparkles, 
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import QuickReviewModal from '../components/QuickReviewModal';
 import { useMovies } from '../context/MovieContext';
+import { useAuth } from '../context/AuthContext';
 import { communityUsers } from '../data/usersData'; 
 import EditProfileModal from '../components/EditProfileModal';
 import FollowModal from '../components/FollowModal';
@@ -34,10 +35,13 @@ export default function ProfilePage() {
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [followModalTab, setFollowModalTab] = useState('followers');
   const [selectedMovieIds, setSelectedMovieIds] = useState([]);
-  // API'den dinamik çekilen filmler ve kullanıcının veritabanı incelemeleri
+  
   const [dbMovies, setDbMovies] = useState([]);
   const [dbUserReviews, setDbUserReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Oturum açan gerçek kullanıcı
+  const { user } = useAuth(); 
 
   const { 
     customLists = [], 
@@ -46,25 +50,24 @@ export default function ProfilePage() {
     watchlist = [], 
     followingList = [], 
     likedMovies = [], 
-    currentUser,
     toggleFollow
   } = useMovies();
   const { showToast } = useToast();
   
-  // Modal State'leri
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const [newListDesc, setNewListDesc] = useState('');
   const [userSearchQuery, setUserSearchQuery] = useState('');
 
-  // 1. Veritabanındaki tüm filmleri ve kullanıcının incelemelerini çek
+  // 1. Verileri Çekme
   useEffect(() => {
+    if (!user) return;
     setLoading(true);
-    const authorName = currentUser?.name || 'Nilay Süzer';
+    const authorName = user.fullName || user.name || user.username || '';
 
     Promise.all([
       fetch('http://localhost:5080/api/movies').then((res) => (res.ok ? res.json() : [])),
-      fetch(`http://localhost:5080/api/reviews/user/${authorName}`).then((res) => (res.ok ? res.json() : []))
+      authorName ? fetch(`http://localhost:5080/api/reviews/user/${authorName}`).then((res) => (res.ok ? res.json() : [])) : Promise.resolve([])
     ])
       .then(([moviesData, reviewsData]) => {
         setDbMovies(moviesData);
@@ -75,22 +78,28 @@ export default function ProfilePage() {
         console.error('Profil verisi çekilemedi:', err);
         setLoading(false);
       });
-  }, [currentUser]);
+  }, [user]);
 
-  // Yeni Liste Oluşturma
-const handleCreateList = (e) => {
-  e.preventDefault();
-  if (!newListTitle.trim()) return;
+  if (!user) {
+    return (
+      <div className="profile-container" style={{ padding: '100px 20px', textAlign: 'center', color: '#fff' }}>
+        <h2>Giriş Yapılmadı</h2>
+        <p style={{ color: '#aaa', marginTop: '10px' }}>Profilinizi görüntülemek için lütfen giriş yapın.</p>
+      </div>
+    );
+  }
 
-  // Başlık, açıklama ve seçilen filmleri gönderiyoruz:
-  createCustomList(newListTitle, newListDesc, selectedMovieIds);
-  
-  setNewListTitle('');
-  setNewListDesc('');
-  setSelectedMovieIds([]);
-  setIsModalOpen(false);
-  showToast('Yeni sinema listeniz oluşturuldu! 🎬', 'success');
-};
+  const handleCreateList = (e) => {
+    e.preventDefault();
+    if (!newListTitle.trim()) return;
+
+    createCustomList(newListTitle, newListDesc, selectedMovieIds);
+    setNewListTitle('');
+    setNewListDesc('');
+    setSelectedMovieIds([]);
+    setIsModalOpen(false);
+    showToast('Yeni sinema listeniz oluşturuldu! 🎬', 'success');
+  };
 
   const handleDeleteList = (listId, listTitle) => {
     if (window.confirm(`"${listTitle}" listesini silmek istediğinize emin misiniz?`)) {
@@ -104,14 +113,14 @@ const handleCreateList = (e) => {
     setIsFollowModalOpen(true);
   };
 
-  // Dinamik Eşleştirmeler (Veritabanındaki filmler üzerinden)
-  const watchlistMovies = dbMovies.filter((m) => watchlist.includes(m.id.toString()));
-  const likedMoviesList = dbMovies.filter((m) => likedMovies.includes(m.id.toString()));
+  // Watchlist, Likes ve Pinned filmleri veritabanındaki filmlerle güvenli eşleştirme
+  const watchlistMovies = dbMovies.filter((m) => watchlist.map(String).includes(m.id.toString()));
+  const likedMoviesList = dbMovies.filter((m) => likedMovies.map(String).includes(m.id.toString()));
 
-  // Pinned Filmler (Varsayılan ilk 4 film veya eşleşenler)
-  const pinnedList = dbMovies.slice(0, 4);
+  // Kullanıcının pinlediği filmler (EditProfileModal'da seçilenler)
+  const pinnedMovieIds = user.pinnedFavorites && user.pinnedFavorites.length > 0 ? user.pinnedFavorites.map(String) : [];
+  const pinnedList = dbMovies.filter((m) => pinnedMovieIds.includes(m.id.toString()));
 
-  // MSSQL'den inceleme silme işlemi
   const handleDeleteReview = async (id) => {
     if (!window.confirm("Bu incelemeyi silmek istediğinize emin misiniz?")) return;
 
@@ -129,7 +138,6 @@ const handleCreateList = (e) => {
     }
   };
 
-  // Topluluk Keşif Filtreleri
   const filteredUsers = communityUsers.filter((u) => {
     return u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
       u.username.toLowerCase().includes(userSearchQuery.toLowerCase());
@@ -137,20 +145,18 @@ const handleCreateList = (e) => {
 
   const suggestedUsers = communityUsers.filter((u) => !followingList.includes(u.username)).slice(0, 3);
 
-  if (!currentUser) {
-    return (
-      <div className="profile-container" style={{ padding: '100px 20px', textAlign: 'center' }}>
-        <h2>Giriş Yapılmadı</h2>
-        <p>Profilinizi görüntülemek için lütfen giriş yapın.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="profile-container">
       {/* 1. BANNER */}
       <div className="profile-banner-wrapper">
-        <img src={currentUser.banner} alt="Profile Banner" className="profile-banner-img" />
+        <div 
+          className="profile-banner-img" 
+          style={{ 
+            background: (user.bannerUrl || user.banner) ? `url(${user.bannerUrl || user.banner}) center/cover no-repeat` : 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
+            height: '240px',
+            width: '100%'
+          }}
+        />
         <div className="banner-overlay"></div>
       </div>
 
@@ -159,7 +165,12 @@ const handleCreateList = (e) => {
         <div className="profile-header-card glass-panel">
           <div className="profile-avatar-row">
             <div className="avatar-wrapper">
-              <img src={currentUser.avatar} alt={currentUser.name} className="profile-avatar" />
+              <img 
+                src={user.avatarUrl || user.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"} 
+                alt={user.fullName || user.name} 
+                className="profile-avatar" 
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+              />
             </div>
 
             <div className="profile-actions-bar">
@@ -185,11 +196,10 @@ const handleCreateList = (e) => {
           </div>
 
           <div className="profile-info">
-            <h1 className="user-name">{currentUser.name}</h1>
-            <span className="user-handle">{currentUser.username}</span>
-            <p className="user-bio">{currentUser.bio}</p>
+            <h1 className="user-name">{user.fullName || user.name || user.username}</h1>
+            <span className="user-handle">{user.username}</span>
+            <p className="user-bio">{user.bio || "Henüz bir biyografi eklenmemiş."}</p>
 
-            {/* Dinamik İstatistikler */}
             <div className="profile-stats">
               <div className="stat-box">
                 <span className="stat-val">{dbUserReviews.length}</span>
@@ -203,34 +213,24 @@ const handleCreateList = (e) => {
                 <span className="stat-val">{likedMovies.length}</span>
                 <span className="stat-lbl">Likes</span>
               </div>
-              <div 
-                className="stat-box clickable-stat" 
-                onClick={() => openFollowModal('followers')}
-                title="Takipçileri Görüntüle"
-              >
-                <span className="stat-val">{currentUser.followers || 328}</span>
+              <div className="stat-box clickable-stat" onClick={() => openFollowModal('followers')}>
+                <span className="stat-val">0</span>
                 <span className="stat-lbl">Followers</span>
               </div>
-
-              <div 
-                className="stat-box clickable-stat" 
-                onClick={() => openFollowModal('following')}
-                title="Takip Edilenleri Görüntüle"
-              >
-                <span className="stat-val">{followingList ? followingList.length : 2}</span>
+              <div className="stat-box clickable-stat" onClick={() => openFollowModal('following')}>
+                <span className="stat-val">{followingList ? followingList.length : 0}</span>
                 <span className="stat-lbl">Following</span>
               </div>
             </div>
           </div>
 
-          {/* TOPLULUK KEŞFİ: KULLANICI ARAMA & TAKİP ÖNERİLERİ */}
+          {/* TOPLULUK KEŞFİ */}
           <section className="community-discovery-section glass-panel">
             <div className="discovery-header">
               <div className="disc-title">
                 <Sparkles size={20} color="#f5c518" />
                 <h3>Sinemasever Topluluğu Keşfet</h3>
               </div>
-
               <div className="user-search-bar">
                 <Search size={16} color="#888" />
                 <input 
@@ -271,7 +271,7 @@ const handleCreateList = (e) => {
           </section>
         </div>
 
-        {/* 3. PINNED FAVORITES */}
+        {/* 3. PINNED FAVORITES (Sabitlenen 4 Başyapıt) */}
         <div className="pinned-section">
           <div className="section-title-row">
             <h3>📌 Favorite Masterpieces</h3>
@@ -279,15 +279,22 @@ const handleCreateList = (e) => {
           </div>
 
           <div className="pinned-grid">
-            {pinnedList.map((film) => (
-              <Link to={`/movie/${film.id}`} key={film.id} className="pinned-card">
-                <img src={film.posterUrl || '/imgs/default.png'} alt={film.title} />
-                <div className="pinned-overlay">
-                  <h4>{film.title}</h4>
-                  <span>{film.releaseYear || 2024}</span>
-                </div>
-              </Link>
-            ))}
+            {pinnedList.length > 0 ? (
+              pinnedList.map((film) => (
+                <Link to={`/movie/${film.id}`} key={film.id} className="pinned-card">
+                  <img src={film.posterUrl || '/imgs/default.png'} alt={film.title} />
+                  <div className="pinned-overlay">
+                    <h4>{film.title}</h4>
+                    <span>{film.releaseYear || 2024}</span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="empty-tab-state glass-panel" style={{ gridColumn: '1 / -1', padding: '30px', textAlign: 'center' }}>
+                <Film size={32} color="#555" />
+                <p style={{ color: '#888', marginTop: '10px' }}>Henüz profilinize film pinlemediniz. "Edit Profile" butonuna tıklayarak başyapıtlarınızı seçebilirsiniz!</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -298,10 +305,7 @@ const handleCreateList = (e) => {
               <FolderHeart size={22} color="#f5c518" />
               <h2>Özel Sinema Koleksiyonları ({customLists.length})</h2>
             </div>
-            <button 
-              className="create-new-list-btn"
-              onClick={() => setIsModalOpen(true)}
-            >
+            <button className="create-new-list-btn" onClick={() => setIsModalOpen(true)}>
               <ListPlus size={16} />
               <span>Yeni Liste Oluştur</span>
             </button>
@@ -310,36 +314,20 @@ const handleCreateList = (e) => {
           <div className="custom-lists-grid">
             {customLists.length > 0 ? (
               customLists.map((list) => {
-                const listMovies = dbMovies.filter((m) =>
-                  list.movieSlugs.includes(m.id.toString())
-                );
-
+                const listMovies = dbMovies.filter((m) => list.movieSlugs.includes(m.id.toString()));
                 return (
                   <div key={list.id} className="custom-list-card glass-panel">
                     <div className="list-card-header">
                       <h3>{list.title}</h3>
-                      <button 
-                        className="delete-list-btn"
-                        title="Listeyi Sil"
-                        onClick={() => handleDeleteList(list.id, list.title)}
-                      >
+                      <button className="delete-list-btn" onClick={() => handleDeleteList(list.id, list.title)}>
                         <Trash2 size={15} />
                       </button>
                     </div>
-
-                    {list.description && (
-                      <p className="list-card-desc">{list.description}</p>
-                    )}
-
+                    {list.description && <p className="list-card-desc">{list.description}</p>}
                     <div className="list-posters-preview">
                       {listMovies.length > 0 ? (
                         listMovies.slice(0, 4).map((movie, idx) => (
-                          <Link 
-                            to={`/movie/${movie.id}`} 
-                            key={movie.id} 
-                            className="poster-preview-item"
-                            style={{ zIndex: 4 - idx }}
-                          >
+                          <Link to={`/movie/${movie.id}`} key={movie.id} className="poster-preview-item" style={{ zIndex: 4 - idx }}>
                             <img src={movie.posterUrl || '/imgs/default.png'} alt={movie.title} />
                           </Link>
                         ))
@@ -350,7 +338,6 @@ const handleCreateList = (e) => {
                         </div>
                       )}
                     </div>
-
                     <div className="list-card-footer">
                       <span className="count-tag">{list.movieSlugs.length} Film</span>
                     </div>
@@ -400,61 +387,56 @@ const handleCreateList = (e) => {
                 </div>
 
                 <div className="form-group">
-  <label style={{ display: 'block', marginBottom: '8px', color: '#f5c518', fontSize: '0.9rem' }}>
-    Listeye Film Ekle ({selectedMovieIds.length} seçildi):
-  </label>
-  <div style={{
-    maxHeight: '160px',
-    overflowY: 'auto',
-    background: 'rgba(0,0,0,0.4)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '8px',
-    padding: '10px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  }}>
-    {dbMovies.map((film) => {
-      const isChecked = selectedMovieIds.includes(film.id.toString());
-      return (
-        <label 
-          key={film.id} 
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '10px', 
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-            color: isChecked ? '#fff' : '#aaa'
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={(e) => {
-              const idStr = film.id.toString();
-              if (e.target.checked) {
-                setSelectedMovieIds(prev => [...prev, idStr]);
-              } else {
-                setSelectedMovieIds(prev => prev.filter(id => id !== idStr));
-              }
-            }}
-            style={{ accentColor: '#f5c518' }}
-          />
-          <span>{film.title} ({film.releaseYear || '2024'})</span>
-        </label>
-      );
-    })}
-  </div>
-</div>
+                  <label style={{ display: 'block', marginBottom: '8px', color: '#f5c518', fontSize: '0.9rem' }}>
+                    Listeye Film Ekle ({selectedMovieIds.length} seçildi):
+                  </label>
+                  <div style={{
+                    maxHeight: '160px',
+                    overflowY: 'auto',
+                    background: 'rgba(0,0,0,0.4)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}>
+                    {dbMovies.map((film) => {
+                      const isChecked = selectedMovieIds.includes(film.id.toString());
+                      return (
+                        <label 
+                          key={film.id} 
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '10px', 
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            color: isChecked ? '#fff' : '#aaa'
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const idStr = film.id.toString();
+                              if (e.target.checked) {
+                                setSelectedMovieIds(prev => [...prev, idStr]);
+                              } else {
+                                setSelectedMovieIds(prev => prev.filter(id => id !== idStr));
+                              }
+                            }}
+                            style={{ accentColor: '#f5c518' }}
+                          />
+                          <span>{film.title} ({film.releaseYear || '2024'})</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
 
-                
                 <div className="modal-actions">
-                  <button 
-                    type="button" 
-                    className="cancel-btn"
-                    onClick={() => setIsModalOpen(false)}
-                  >
+                  <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>
                     Vazgeç
                   </button>
                   <button type="submit" className="confirm-btn">
@@ -466,34 +448,21 @@ const handleCreateList = (e) => {
           </div>
         )}
 
-        {/* 4. SEKMELER (TABS) */}
+        {/* SEKMELER */}
         <div className="profile-tabs-bar">
-          <button 
-            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reviews')}
-          >
-            <Star size={17} />
-            My Reviews ({dbUserReviews.length})
+          <button className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>
+            <Star size={17} /> My Reviews ({dbUserReviews.length})
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'watchlist' ? 'active' : ''}`}
-            onClick={() => setActiveTab('watchlist')}
-          >
-            <Bookmark size={17} />
-            Watchlist ({watchlistMovies.length})
+          <button className={`tab-btn ${activeTab === 'watchlist' ? 'active' : ''}`} onClick={() => setActiveTab('watchlist')}>
+            <Bookmark size={17} /> Watchlist ({watchlistMovies.length})
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'likes' ? 'active' : ''}`}
-            onClick={() => setActiveTab('likes')}
-          >
-            <Heart size={17} />
-            Likes ({likedMoviesList.length})
+          <button className={`tab-btn ${activeTab === 'likes' ? 'active' : ''}`} onClick={() => setActiveTab('likes')}>
+            <Heart size={17} /> Likes ({likedMoviesList.length})
           </button>
         </div>
 
         {/* TAB İÇERİKLERİ */}
         <div className="tab-body">
-          {/* A. REVIEWS (MSSQL'deki kullanıcının gerçek yorumları) */}
           {activeTab === 'reviews' && (
             <div className="reviews-list">
               {dbUserReviews.length > 0 ? (
@@ -502,38 +471,23 @@ const handleCreateList = (e) => {
                     <Link to={`/movie/${item.movieId}`} className="review-film-poster">
                       <img src={item.poster} alt={item.movieTitle} />
                     </Link>
-
                     <div className="review-film-details">
                       <div className="review-top-line">
-                        <Link to={`/movie/${item.movieId}`} className="review-film-name">
-                          {item.movieTitle}
-                        </Link>
+                        <Link to={`/movie/${item.movieId}`} className="review-film-name">{item.movieTitle}</Link>
                         <div className="review-date">
                           <Calendar size={13} />
                           <span>{new Date(item.createdAt).toLocaleDateString('tr-TR')}</span>
                         </div>
                       </div>
-
                       <div className="review-rating-row">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <Star 
-                            key={i} 
-                            size={16} 
-                            color="#f5c518" 
-                            fill={i < Math.floor(item.rating) ? "#f5c518" : "none"} 
-                          />
+                          <Star key={i} size={16} color="#f5c518" fill={i < Math.floor(item.rating) ? "#f5c518" : "none"} />
                         ))}
                         <span className="rating-num">{item.rating}/5</span>
                       </div>
-
                       <p className="review-text">{item.comment}</p>
-
                       <div className="review-card-footer">
-                        <button 
-                          className="delete-review-btn" 
-                          onClick={() => handleDeleteReview(item.id)}
-                          title="Delete review"
-                        >
+                        <button className="delete-review-btn" onClick={() => handleDeleteReview(item.id)}>
                           <Trash2 size={15} /> Sil
                         </button>
                       </div>
@@ -549,7 +503,6 @@ const handleCreateList = (e) => {
             </div>
           )}
 
-          {/* B. WATCHLIST (MSSQL'den gelen filmler) */}
           {activeTab === 'watchlist' && (
             <div className="watchlist-grid">
               {watchlistMovies.length > 0 ? (
@@ -573,7 +526,6 @@ const handleCreateList = (e) => {
             </div>
           )}
 
-          {/* C. LIKES (MSSQL'den gelen beğenilen filmler) */}
           {activeTab === 'likes' && (
             <div className="watchlist-grid">
               {likedMoviesList.length > 0 ? (
@@ -583,9 +535,7 @@ const handleCreateList = (e) => {
                     <div className="watchlist-info">
                       <div className="card-title">{film.title}</div>
                       <Link to={`/movie/${film.id}`}>
-                        <button className="watch-now-btn" style={{ background: '#ff4757', color: '#fff' }}>
-                          Go to Movie
-                        </button>
+                        <button className="watch-now-btn" style={{ background: '#ff4757', color: '#fff' }}>Go to Movie</button>
                       </Link>
                     </div>
                   </div>
@@ -602,22 +552,9 @@ const handleCreateList = (e) => {
       </div>
 
       {/* MODALLAR */}
-      <EditProfileModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
-      />
-      
-      <FollowModal 
-        isOpen={isFollowModalOpen} 
-        onClose={() => setIsFollowModalOpen(false)} 
-        initialTab={followModalTab}
-      />
-
-      <QuickReviewModal 
-        isOpen={isLogModalOpen} 
-        onClose={() => setIsLogModalOpen(false)} 
-        lang="TR"
-      />
+      <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+      <FollowModal isOpen={isFollowModalOpen} onClose={() => setIsFollowModalOpen(false)} initialTab={followModalTab} />
+      <QuickReviewModal isOpen={isLogModalOpen} onClose={() => setIsLogModalOpen(false)} lang="TR" />
     </div>
   );
 }

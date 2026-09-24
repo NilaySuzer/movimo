@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const MovieContext = createContext();
 
 export function MovieProvider({ children }) {
-  // 1. API'den Gelen Filmler (Merkezi State)
   const [movies, setMovies] = useState([]);
   const [loadingMovies, setLoadingMovies] = useState(true);
 
@@ -24,67 +23,127 @@ export function MovieProvider({ children }) {
     fetchMovies();
   }, []);
 
-  // 2. Kullanıcı State'i
-  const [currentUser, setCurrentUser] = useState(() => {
-    const savedUser = localStorage.getItem('movie_current_user');
-    return savedUser ? JSON.parse(savedUser) : {
-      id: 'u_1',
-      name: "Nilay Süzer",
-      username: "@nilaysuzer",
-      email: "nilay@example.com",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
-      bio: "Film enthusiast, aspiring cinephile & software developer. Nolan and Tim Burton worshipper 🎬✨",
-      followers: 328,
-      following: 195,
-      isLoggedIn: true,
-      pinnedFavorites: ['1', '2', '3', '4']
-    };
+  // 1. Gerçek Kullanıcı State'i (AuthContext / localStorage 'user' anahtarından beslenir)
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
   });
-
-  // 3. Özel Kullanıcı Listeleri State'i (Filmler ID ile tutulur)
-  const [customLists, setCustomLists] = useState(() => {
-    const saved = localStorage.getItem('cinenest_custom_lists');
-    return saved ? JSON.parse(saved) : [
-      { 
-        id: 'list-1', 
-        title: 'Gece Kuşağı & Zihin Bükücüler', 
-        description: 'Gece yarısı izlenmesi gereken atmosferik yapımlar.',
-        movieSlugs: ['1', '2'] 
-      }
-    ];
-  });
-
-  // 4. MSSQL Backend Senkronizasyonlu Etkileşimler
-  const [interactions, setInteractions] = useState([]);
-  const activeUserId = 'default_user';
 
   useEffect(() => {
-    fetch(`http://localhost:5080/api/interactions/user/${activeUserId}`)
+    const handleStorageChange = () => {
+      const savedUser = localStorage.getItem('user');
+      setUser(savedUser ? JSON.parse(savedUser) : null);
+    };
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Periyodik kontrol ile Auth güncellemelerini anında yakala
+    const interval = setInterval(() => {
+      const savedUser = localStorage.getItem('user');
+      const parsed = savedUser ? JSON.parse(savedUser) : null;
+      if (JSON.stringify(parsed) !== JSON.stringify(user)) {
+        setUser(parsed);
+      }
+    }, 400);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [user]);
+
+  // 2. Özel Kullanıcı Listeleri
+  const [customLists, setCustomLists] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    if (!savedUser) return [];
+    try {
+      const uId = JSON.parse(savedUser).id;
+      const saved = localStorage.getItem(`cinenest_custom_lists_${uId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    if (user?.id) {
+      const saved = localStorage.getItem(`cinenest_custom_lists_${user.id}`);
+      setCustomLists(saved ? JSON.parse(saved) : []);
+    } else {
+      setCustomLists([]);
+    }
+  }, [user]);
+ const currentUserId = user?.username ? user.username.replace('@', '') : 'default_user';
+
+  useEffect(() => {
+    if (!user) {
+      setInteractions([]);
+      return;
+    }
+    fetch(`http://localhost:5080/api/interactions/user/${currentUserId}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setInteractions(data))
       .catch((err) => console.error('Etkileşimler API hatası:', err));
-  }, []);
+  }, [user]);
+
+  // 3. MSSQL Backend Etkileşimleri (Watchlist & Likes) - LocalStorage Yedekli
+ const [interactions, setInteractions] = useState(() => {
+
+    const savedUser = localStorage.getItem('user');
+
+    if (!savedUser) return [];
+
+    try {
+
+      const uId = JSON.parse(savedUser).id;
+
+      const saved = localStorage.getItem(`interactions_${uId}`);
+
+      return saved ? JSON.parse(saved) : [];
+
+    } catch {
+
+      return [];
+
+    }
+
+  });
+
+  useEffect(() => {
+    if (!user?.id) {
+      setInteractions([]);
+      return;
+    }
+    fetch(`http://localhost:5080/api/interactions/user/${user.id}`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        setInteractions(data);
+        localStorage.setItem(`interactions_${user.id}`, JSON.stringify(data));
+      })
+      .catch((err) => console.error('Etkileşimler API hatası:', err));
+  }, [user]);
 
   const isInWatchlist = (slugOrId) => {
-    const movieId = parseInt(slugOrId, 10);
-    const item = interactions.find((i) => i.movieId === movieId);
-    return item ? item.isInWatchlist : false;
+    if (!slugOrId) return false;
+    const targetId = String(slugOrId);
+    const item = interactions.find((i) => String(i.movieId) === targetId);
+    return item ? Boolean(item.isInWatchlist) : false;
   };
 
   const isMovieLiked = (slugOrId) => {
-    const movieId = parseInt(slugOrId, 10);
-    const item = interactions.find((i) => i.movieId === movieId);
-    return item ? item.isLiked : false;
+    if (!slugOrId) return false;
+    const targetId = String(slugOrId);
+    const item = interactions.find((i) => String(i.movieId) === targetId);
+    return item ? Boolean(item.isLiked) : false;
   };
 
-  const toggleWatchlist = async (slugOrId) => {
+ const toggleWatchlist = async (slugOrId) => {
+    if (!user) return alert('Lütfen önce giriş yapın.');
     const movieId = parseInt(slugOrId, 10);
     try {
       const res = await fetch('http://localhost:5080/api/interactions/toggle-watchlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId, userId: activeUserId })
+        body: JSON.stringify({ movieId, userId: currentUserId })
       });
       if (res.ok) {
         const data = await res.json();
@@ -102,12 +161,13 @@ export function MovieProvider({ children }) {
   };
 
   const toggleLike = async (slugOrId) => {
+    if (!user) return alert('Lütfen önce giriş yapın.');
     const movieId = parseInt(slugOrId, 10);
     try {
       const res = await fetch('http://localhost:5080/api/interactions/toggle-like', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId, userId: activeUserId })
+        body: JSON.stringify({ movieId, userId: currentUserId })
       });
       if (res.ok) {
         const data = await res.json();
@@ -124,151 +184,84 @@ export function MovieProvider({ children }) {
     }
   };
 
-  // Özel liste metodları (Seçilen film ID'lerini de alabilir)
   const createCustomList = (title, description = '', selectedIds = []) => {
-    if (!title.trim()) return;
+    if (!title.trim() || !user) return;
     const newList = {
       id: `list-${Date.now()}`,
       title: title.trim(),
       description: description.trim(),
-      movieSlugs: selectedIds.map(String) // ID'leri dizi olarak sakla
+      movieSlugs: selectedIds.map(String)
     };
     const updated = [newList, ...customLists];
     setCustomLists(updated);
-    localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
+    localStorage.setItem(`cinenest_custom_lists_${user.id}`, JSON.stringify(updated));
   };
 
   const deleteCustomList = (listId) => {
+    if (!user) return;
     const updated = customLists.filter((l) => l.id !== listId);
     setCustomLists(updated);
-    localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
+    localStorage.setItem(`cinenest_custom_lists_${user.id}`, JSON.stringify(updated));
   };
 
-  const toggleMovieInList = (listId, movieSlugOrId) => {
-    const idStr = movieSlugOrId.toString();
-    const updated = customLists.map((list) => {
-      if (list.id === listId) {
-        const exists = list.movieSlugs.includes(idStr);
-        const newSlugs = exists
-          ? list.movieSlugs.filter((s) => s !== idStr)
-          : [...list.movieSlugs, idStr];
-        return { ...list, movieSlugs: newSlugs };
-      }
-      return list;
-    });
-    setCustomLists(updated);
-    localStorage.setItem('cinenest_custom_lists', JSON.stringify(updated));
-  };
-
-  // Kullanıcı İncelemeleri State'i
+  // Kullanıcı İncelemeleri
   const [userReviews, setUserReviews] = useState(() => {
-    const saved = localStorage.getItem('movie_user_reviews');
-    return saved ? JSON.parse(saved) : [];
+    const savedUser = localStorage.getItem('user');
+    if (!savedUser) return [];
+    try {
+      const uId = JSON.parse(savedUser).id;
+      const saved = localStorage.getItem(`movie_user_reviews_${uId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
-  const [lang, setLang] = useState(() => localStorage.getItem('movie_lang') || 'TR');
-  const [cinemaMode, setCinemaMode] = useState(() => localStorage.getItem('movie_cinema_mode') === 'true');
-  const [followingList, setFollowingList] = useState(() => {
-    const saved = localStorage.getItem('movie_following');
-    return saved ? JSON.parse(saved) : ['@christophernolan', '@cinephile_girl'];
-  });
-
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('movie_current_user', JSON.stringify(currentUser));
+    if (user?.id) {
+      const saved = localStorage.getItem(`movie_user_reviews_${user.id}`);
+      setUserReviews(saved ? JSON.parse(saved) : []);
     } else {
-      localStorage.removeItem('movie_current_user');
+      setUserReviews([]);
     }
-  }, [currentUser]);
-
-  useEffect(() => {
-    localStorage.setItem('movie_user_reviews', JSON.stringify(userReviews));
-  }, [userReviews]);
-
-  useEffect(() => {
-    localStorage.setItem('movie_lang', lang);
-  }, [lang]);
-
-  useEffect(() => {
-    localStorage.setItem('movie_cinema_mode', cinemaMode);
-    if (cinemaMode) {
-      document.body.classList.add('cinema-mode');
-    } else {
-      document.body.classList.remove('cinema-mode');
-    }
-  }, [cinemaMode]);
-
-  useEffect(() => {
-    localStorage.setItem('movie_following', JSON.stringify(followingList));
-  }, [followingList]);
-
-  // Auth Metodları
-  const login = (email, password) => {
-    const user = {
-      id: 'u_1',
-      name: "Nilay Süzer",
-      username: `@${email.split('@')[0]}`,
-      email: email,
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
-      bio: "Film enthusiast, aspiring cinephile & software developer. Nolan and Tim Burton worshipper 🎬✨",
-      followers: 328,
-      following: 195,
-      isLoggedIn: true
-    };
-    setCurrentUser(user);
-    return true;
-  };
-
-  const register = (name, email, password) => {
-    const newUser = {
-      id: 'u_' + Date.now(),
-      name: name,
-      username: `@${email.split('@')[0]}`,
-      email: email,
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80",
-      bio: "Yeni bir sinemasever aramıza katıldı! 🎬",
-      followers: 0,
-      following: 0,
-      isLoggedIn: true
-    };
-    setCurrentUser(newUser);
-    return true;
-  };
-
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('movie_current_user');
-  };
-
-  const updateProfile = (updatedFields) => {
-    setCurrentUser((prev) => ({
-      ...prev,
-      ...updatedFields
-    }));
-  };
+  }, [user]);
 
   const addReview = (reviewData) => {
+    if (!user) return;
     const newReview = {
       id: Date.now(),
       ...reviewData,
-      isSpoiler: Boolean(reviewData.isSpoiler),
-      text: reviewData.comment || reviewData.text,
-      upvotes: 0
+      createdAt: new Date().toISOString()
     };
-    setUserReviews((prev) => [newReview, ...prev]);
+    const updated = [newReview, ...userReviews];
+    setUserReviews(updated);
+    localStorage.setItem(`movie_user_reviews_${user.id}`, JSON.stringify(updated));
   };
 
   const deleteReview = (id) => {
-    setUserReviews((prev) => prev.filter((r) => r.id !== id));
+    if (!user) return;
+    const updated = userReviews.filter((r) => r.id !== id);
+    setUserReviews(updated);
+    localStorage.setItem(`movie_user_reviews_${user.id}`, JSON.stringify(updated));
   };
 
-  const toggleFollow = (username) => {
-    setFollowingList((prev) => {
-      const isFollowing = prev.includes(username);
-      const updated = isFollowing ? prev.filter(u => u !== username) : [...prev, username];
-      setCurrentUser(u => u ? { ...u, following: updated.length } : u);
+  const [lang, setLang] = useState('TR');
+  const [cinemaMode, setCinemaMode] = useState(false);
+  const [followingList, setFollowingList] = useState([]);
+
+  const logout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setInteractions([]);
+    setCustomLists([]);
+    setUserReviews([]);
+  };
+
+  const updateProfile = (updatedFields) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem('user', JSON.stringify(updated));
       return updated;
     });
   };
@@ -276,27 +269,23 @@ export function MovieProvider({ children }) {
   return (
     <MovieContext.Provider
       value={{
-        movies,              // 👈 TÜM UYGULAMA İÇİN API FİLMLERİ
+        movies,
         loadingMovies,
         fetchMovies,
-        currentUser,
+        currentUser: user, // 👈 Eski uyumluluk için currentUser alias olarak user'ı döndürüyoruz
         updateProfile,
         followingList,
         customLists,
         createCustomList,
         deleteCustomList,
-        toggleMovieInList,
-        toggleFollow,
-        login,
-        register,
         logout,
-        watchlist: interactions.filter((i) => i.isInWatchlist).map((i) => i.movieId.toString()),
-        likedMovies: interactions.filter((i) => i.isLiked).map((i) => i.movieId.toString()),
+        watchlist: interactions.filter((i) => i.isInWatchlist).map((i) => String(i.movieId)),
+        likedMovies: interactions.filter((i) => i.isLiked).map((i) => String(i.movieId)),
         userReviews,
-        toggleWatchlist,
-        toggleLike,
         addReview,
         deleteReview,
+        toggleWatchlist,
+        toggleLike,
         isInWatchlist,
         isMovieLiked,
         lang,

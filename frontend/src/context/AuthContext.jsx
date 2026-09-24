@@ -5,7 +5,6 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Sayfa yenilendiğinde localStorage'da oturum açmış kullanıcı var mı diye kontrol et
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
