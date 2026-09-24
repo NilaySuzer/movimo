@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<PollOption> PollOptions => Set<PollOption>();
 
     public DbSet<MovieCast> MovieCasts { get; set; }
-
+    public DbSet<User> Users { get; set; }
     public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
     public DbSet<MovieTrivia> MovieTrivias => Set<MovieTrivia>();
     public DbSet<UserInteraction> UserInteractions => Set<UserInteraction>();
