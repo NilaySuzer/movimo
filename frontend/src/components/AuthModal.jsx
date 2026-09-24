@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, User, Clapperboard, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import '../styles/auth.css';
-
+import { useAuth } from '../context/AuthContext';
 const API_URL = 'http://localhost:5080/api';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', onAuthSuccess }) {
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [showPassword, setShowPassword] = useState(false);
-
+const { login } = useAuth();
   // Form State
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -41,7 +41,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onAu
           localStorage.setItem('user', JSON.stringify(response.data.user));
           if (onAuthSuccess) onAuthSuccess(response.data.user);
         }
-        
+        login(response.data.user);
         setLoading(false);
         onClose();
       } else {

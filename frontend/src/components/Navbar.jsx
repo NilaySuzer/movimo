@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { categories } from '../data/categoriesData';
 import { useMovies } from '../context/MovieContext';
+import { useAuth } from '../context/AuthContext';
 import QuickReviewModal from './QuickReviewModal';
 import '../styles/navbar.css';
 import AuthModal from './AuthModal';
@@ -41,8 +42,7 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [lang, setLang] = useState('EN');
-  const [cinemaMode, setCinemaMode] = useState(false);
-    const { watchlist, currentUser, logout } = useMovies(); // currentUser ve logout aldık
+  const [cinemaMode, setCinemaMode] = useState(false); 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +52,7 @@ export default function Navbar() {
 
   const navRef = useRef(null);
   const searchRef = useRef(null);
-
+const { user, logout } = useAuth();
   // 1. Veritabanındaki tüm filmleri API'den çek
   useEffect(() => {
     fetch('http://localhost:5080/api/movies')
@@ -286,7 +286,7 @@ export default function Navbar() {
 
             
             {/* 6. BİLDİRİMLER (TIKLAMAYLA AÇILIR) */}
-           {currentUser && (
+           {user && (
   <li className="nav-item dropdown">
     <button 
       type="button"
@@ -340,58 +340,62 @@ export default function Navbar() {
               </button>
             </li>
 
-           {currentUser ? (
-    <li className="nav-item dropdown">
-      <button 
-        type="button"
-        className="account-trigger"
-        onClick={() => toggleDropdown('account')}
-      >
-        <div className="avatar-circle">
-          {currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : 'ME'}
-        </div>
-        <ChevronDown size={13} className={`dropdown-arrow ${activeDropdown === 'account' ? 'rotated' : ''}`} />
-      </button>
+          {user ? (
+  <li className="nav-item dropdown">
+    <button 
+      type="button"
+      className="account-trigger"
+      onClick={() => toggleDropdown('account')}
+    >
+      <div className="avatar-circle" style={{ overflow: 'hidden' }}>
+        {user.avatarUrl ? (
+          <img src={user.avatarUrl} alt={user.fullName || user.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          (user.fullName || user.username) ? (user.fullName || user.username).slice(0, 2).toUpperCase() : 'ME'
+        )}
+      </div>
+      <ChevronDown size={13} className={`dropdown-arrow ${activeDropdown === 'account' ? 'rotated' : ''}`} />
+    </button>
 
-      {activeDropdown === 'account' && (
-        <ul className="dropdown-menu account-menu glass-panel">
-          <li className="account-info-snippet">
-            <strong>{currentUser.name}</strong>
-            <span>{currentUser.username}</span>
-          </li>
-          <li className="divider"></li>
-          <li>
-            <Link to="/profile" className="dropdown-link" onClick={closeAll}>
-              <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Page / Profile'}
-            </Link>
-          </li>
-          <li>
-            <Link to="/about" className="dropdown-link" onClick={closeAll}>
-              <Info size={15} /> {lang === 'TR' ? 'Hakkımızda' : 'About'}
-            </Link>
-          </li>
-          <li>
-            <Link to="/contact" className="dropdown-link" onClick={closeAll}>
-              <Mail size={15} /> {lang === 'TR' ? 'İletişim' : 'Contact'}
-            </Link>
-          </li>
-          <li className="divider"></li>
-          <li>
-            <button className="dropdown-link logout-btn" onClick={() => { closeAll(); logout(); }}>
-              <LogOut size={15} /> {lang === 'TR' ? 'Çıkış Yap' : 'Log Out'}
-            </button>
-          </li>
-        </ul>
-      )}
-    </li>
-  ) : (
-    <li className="nav-item">
-      <button className="nav-login-btn" onClick={() => setIsAuthModalOpen(true)}>
-        <LogIn size={15} />
-        <span>{lang === 'TR' ? 'Giriş Yap/Kayıt ol' : 'Sign In/Register'}</span>
-      </button>
-    </li>
-  )}
+    {activeDropdown === 'account' && (
+      <ul className="dropdown-menu account-menu glass-panel">
+        <li className="account-info-snippet">
+          <strong>{user.fullName || user.username}</strong>
+          <span>@{user.username}</span>
+        </li>
+        <li className="divider"></li>
+        <li>
+          <Link to="/profile" className="dropdown-link" onClick={closeAll}>
+            <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Page / Profile'}
+          </Link>
+        </li>
+        <li>
+          <Link to="/about" className="dropdown-link" onClick={closeAll}>
+            <Info size={15} /> {lang === 'TR' ? 'Hakkımızda' : 'About'}
+          </Link>
+        </li>
+        <li>
+          <Link to="/contact" className="dropdown-link" onClick={closeAll}>
+            <Mail size={15} /> {lang === 'TR' ? 'İletişim' : 'Contact'}
+          </Link>
+        </li>
+        <li className="divider"></li>
+        <li>
+          <button className="dropdown-link logout-btn" onClick={() => { closeAll(); logout(); }}>
+            <LogOut size={15} /> {lang === 'TR' ? 'Çıkış Yap' : 'Log Out'}
+          </button>
+        </li>
+      </ul>
+    )}
+  </li>
+) : (
+  <li className="nav-item">
+    <button className="nav-login-btn" onClick={() => setIsAuthModalOpen(true)}>
+      <LogIn size={15} />
+      <span>{lang === 'TR' ? 'Giriş Yap/Kayıt ol' : 'Sign In/Register'}</span>
+    </button>
+  </li>
+)}
           </ul>
         </div>
       </nav>
