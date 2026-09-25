@@ -16,9 +16,9 @@ public class InteractionsController : ControllerBase
         _context = context;
     }
 
-    // GET: api/interactions/user/default_user
+    // GET: api/interactions/user/{userId}
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetUserInteractions(string userId)
+    public async Task<IActionResult> GetUserInteractions(int userId)
     {
         var interactions = await _context.UserInteractions
             .Where(i => i.UserId == userId)
@@ -87,5 +87,5 @@ public class InteractionsController : ControllerBase
 public class InteractionRequest
 {
     public int MovieId { get; set; }
-    public string UserId { get; set; } = "default_user";
+    public int UserId { get; set; }
 }

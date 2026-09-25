@@ -144,7 +144,10 @@ export function MovieProvider({ children }) {
       const res = await fetch('http://localhost:5080/api/interactions/toggle-watchlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId, userId: currentUserId })
+        body: JSON.stringify({ 
+          movieId, 
+          userId: parseInt(user.id, 10) 
+        })
       });
       if (res.ok) {
         const data = await res.json();
@@ -171,7 +174,10 @@ export function MovieProvider({ children }) {
       const res = await fetch('http://localhost:5080/api/interactions/toggle-like', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId, userId: currentUserId })
+         body: JSON.stringify({ 
+            movieId, 
+            userId: parseInt(user.id, 10)
+                })
       });
       if (res.ok) {
         const data = await res.json();

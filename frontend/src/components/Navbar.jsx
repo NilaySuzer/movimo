@@ -361,12 +361,12 @@ const { user, logout } = useAuth();
       <ul className="dropdown-menu account-menu glass-panel">
         <li className="account-info-snippet">
           <strong>{user.fullName || user.username}</strong>
-          <span>@{user.username}</span>
+          <span>{user.username.startsWith('@') ? user.username : `@${user.username}`}</span>
         </li>
         <li className="divider"></li>
         <li>
           <Link to="/profile" className="dropdown-link" onClick={closeAll}>
-            <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Page / Profile'}
+            <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Profile'}
           </Link>
         </li>
         <li>

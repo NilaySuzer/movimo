@@ -105,13 +105,21 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FindAsync(id);
         if (user == null) return NotFound(new { message = "Kullanıcı bulunamadı." });
 
-        // Sadece adı değil, tüm profil detaylarını veritabanına mühürlüyoruz:
+        if (!string.IsNullOrEmpty(dto.Username) && dto.Username != user.Username)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+            if (existingUser != null)
+            {
+                return BadRequest(new { message = "Bu kullanıcı adı zaten alınmış!" });
+            }
+            user.Username = dto.Username;
+        }
+
         user.FullName = dto.FullName ?? user.FullName;
-        user.Username = dto.Username ?? user.Username;
-        user.Bio = dto.Bio;
-        user.AvatarUrl = dto.AvatarUrl;
-        user.BannerUrl = dto.BannerUrl;
-        user.PinnedFavorites = dto.PinnedFavorites;
+        user.Bio = dto.Bio ?? user.Bio;
+        user.AvatarUrl = dto.AvatarUrl ?? user.AvatarUrl;
+        user.BannerUrl = dto.BannerUrl ?? user.BannerUrl;
+        user.PinnedFavorites = dto.PinnedFavorites ?? user.PinnedFavorites;
 
         await _context.SaveChangesAsync();
 

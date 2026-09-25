@@ -79,6 +79,8 @@ export default function EditProfileModal({ isOpen, onClose }) {
         const updatedUser = {
           ...user,
           ...res.data,
+          watchlist: (res.data.watchlist && res.data.watchlist.length > 0) ? res.data.watchlist : user.watchlist,
+          likes: (res.data.likes && res.data.likes.length > 0) ? res.data.likes : user.likes,
           pinnedFavorites: res.data.pinnedFavorites ? res.data.pinnedFavorites.split(',').filter(Boolean) : pinned
         };
 
