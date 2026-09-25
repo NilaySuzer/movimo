@@ -17,6 +17,7 @@ import {
   HelpCircle, Eye, EyeOff, ThumbsUp, BarChart2, ShieldAlert
 } from 'lucide-react';
 import { categories } from '../data/categoriesData';
+import { useAuth } from '../context/AuthContext';
 import { useMovies } from '../context/MovieContext';
 import '../styles/detail.css';
 import { useToast } from '../context/ToastContext';
@@ -194,14 +195,19 @@ const categoryInfo = categories.find(
     e.preventDefault();
     if (!newCommentText || !newCommentText.trim()) return;
 
-    // Aktif kullanıcının adı, yoksa elle girilen ad, o da yoksa varsayılan isim
-    const author = (currentUser && currentUser.name) 
-      ? currentUser.name 
-      : (typeof newCommentName !== 'undefined' && newCommentName.trim() ? newCommentName.trim() : "Nilay Süzer");
+    // Giriş yapmış kullanıcı yoksa uyarı verelim veya işlem yaptırmayalım
+    if (!currentUser) {
+      showToast('Yorum yapmak için lütfen giriş yapın.', 'error');
+      return;
+    }
+
+    // Aktif kullanıcının username'i (veya fullName'i), yoksa varsayılan isim
+    const author = currentUser.username || currentUser.fullName || "Nilay Süzer";
 
     const payload = {
       movieId: parseInt(slug, 10),
-      user: author,
+      userId: currentUser.id, // 👈 Sayısal ID (Kullanıcı adını değiştirsen bile yorumlar asla kopmaz)
+      user: author,           // 👈 Yazar olarak kullanıcının adı/username'i
       comment: newCommentText.trim(),
       rating: Number(newCommentRating) || 5,
       isSpoiler: Boolean(isSpoiler),
@@ -224,7 +230,6 @@ const categoryInfo = categories.find(
       const savedReview = await res.json();
 
       setComments((prev) => [savedReview, ...prev]);
-      if (typeof setNewCommentName === 'function') setNewCommentName('');
       setNewCommentText('');
       setNewCommentRating(5);
       setIsSpoiler(false);
@@ -434,13 +439,13 @@ const categoryInfo = categories.find(
       {/* YORUM YAZMA VE LİSTESİ */}
       <section id="comment-section" className="comments-module-container">
         <div className="comments-header">
-          <h2>💬 Kullanıcı İncelemeleri ({comments.length})</h2>
-          <span className="scroll-hint-pill">Aşağı kaydırarak tüm incelemeleri inceleyebilirsiniz</span>
+          <h2>💬 Kullanıcı Yorumları ({comments.length})</h2>
+          <span className="scroll-hint-pill">Aşağı kaydırarak tüm yorumları inceleyebilirsiniz</span>
         </div>
 
         <div className="comment-form-wide glass-panel">
           <div className="form-header-line">
-            <h3>Bu Filme Puan Ver & İnceleme Paylaş</h3>
+            <h3>Bu Filme Puan Ver & Yorum Yap</h3>
             <div className="rating-select-stars">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -460,19 +465,9 @@ const categoryInfo = categories.find(
 
           <form onSubmit={handleCommentSubmit} className="wide-comment-form">
             <div className="wide-inputs-row">
-              <div className="form-group user-input-col">
-                <label>Kullanıcı Adınız:</label>
-                <input
-                  type="text"
-                  placeholder="Örn: Nilay"
-                  value={newCommentName}
-                  onChange={(e) => setNewCommentName(e.target.value)}
-                  required
-                />
-              </div>
 
               <div className="form-group text-input-col">
-                <label>İncelemeniz:</label>
+                <label>Yorumunuz:</label>
                 <textarea
                   rows="2"
                   placeholder="Film hakkındaki düşünceleriniz, yönetmenlik, sinematografi..."
@@ -492,7 +487,7 @@ const categoryInfo = categories.find(
                 />
                 <ShieldAlert size={16} color={isSpoiler ? "#ff4757" : "#888"} />
                 <span style={{ color: isSpoiler ? "#ff4757" : "#aaa" }}>
-                  Bu inceleme sürprizbozan (spoiler) içerir
+                  Bu yorum sürprizbozan (spoiler) içerir
                 </span>
               </label>
 
