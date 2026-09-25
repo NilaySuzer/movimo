@@ -202,7 +202,7 @@ export default function ProfilePage() {
 
           <div className="profile-info">
             <h1 className="user-name">{user.fullName || user.name || user.username}</h1>
-            <span className="user-handle">{user.username}</span>
+            <span className="user-handle">@{user.username}</span>
             <p className="user-bio">{user.bio || "Henüz bir biyografi eklenmemiş."}</p>
 
             <div className="profile-stats">
