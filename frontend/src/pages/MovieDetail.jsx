@@ -14,7 +14,7 @@ import {
   Users,        
   ChevronDown,  
   ChevronUp,    
-  HelpCircle, Eye, EyeOff, ThumbsUp, BarChart2, ShieldAlert
+  HelpCircle, Trash2, Eye, EyeOff, ThumbsUp, BarChart2, ShieldAlert
 } from 'lucide-react';
 import { categories } from '../data/categoriesData';
 import { useAuth } from '../context/AuthContext';
@@ -27,7 +27,7 @@ export default function MovieDetail() {
   const navigate = useNavigate();
   const [isSpoiler, setIsSpoiler] = useState(false);
   const [unblurredComments, setUnblurredComments] = useState({});
-
+  const { user } = useAuth();
   // API'den gelen dinamik film ve yorum state'leri
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -240,6 +240,28 @@ const categoryInfo = categories.find(
     }
   };
 
+ const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Bu yorumu silmek istediğinize emin misiniz?')) return;
+
+    try {
+      const res = await fetch(`http://localhost:5080/api/reviews/${reviewId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        // Silinen yorumu listeden düşürüyoruz
+        setComments((prev) => prev.filter((r) => r.id !== reviewId));
+        showToast('Yorum silindi.', 'success');
+      } else {
+        showToast('Yorum silinemedi.', 'error');
+      }
+    } catch (err) {
+      console.error('Silme hatası:', err);
+      showToast('Bir hata oluştu.', 'error');
+    }
+  };
+
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     showToast('Film bağlantısı panoya kopyalandı! 🔗', 'success');
@@ -336,7 +358,7 @@ const categoryInfo = categories.find(
           <div className="jump-review-bar">
             <a href="#comment-section" className="review-jump-btn" style={{ backgroundColor: themeColor === '#f5c518' ? '#000' : '#fff'}}>
               <MessageSquare size={17} />
-              <span>Yorumları Oku & İnceleme Yaz</span>
+              <span>Yorumları Oku & Yorum Yap</span>
             </a>
           </div>
         </div>
@@ -507,14 +529,20 @@ const categoryInfo = categories.find(
           {comments.length > 0 ? (
             comments.map((c, index) => {
               const hasSpoiler = c.isSpoiler;
-              const isRevealed = unblurredComments[index];
+              const isRevealed = unblurredComments[index]; 
+              const authorId = c.userId || c.UserId || c.authorId || c.AuthorId || c.user.id; // API'den gelen yazar ID'si
+              const isOwner = currentUser && (currentUser.id === authorId || currentUser.username === c.user);
               return (
                 <div key={c.id || index} className="single-comment-card glass-panel">
                   <div className="comment-card-top">
                     <div className="commenter-meta">
-                      <strong className="commenter-name" style={{ color: themeColor }}>
-                        {c.user}
-                      </strong>
+                        <Link 
+                         to={c.userId ? `/profile/${c.userId}` : "/profile"}
+                          className="commenter-name hover:underline cursor-pointer" 
+                          style={{ color: themeColor }}
+                          >
+                          {c.user}
+                          </Link>
                       <span className="comment-date-tag">
                         {c.createdAt ? new Date(c.createdAt).toLocaleDateString('tr-TR') : (c.date || 'Az önce')}
                       </span>
@@ -571,6 +599,15 @@ const categoryInfo = categories.find(
                       <ThumbsUp size={14} />
                       <span>Faydalı Buldum ({c.upvotes || 0})</span>
                     </button>
+                    {isOwner && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteReview(c.id)}
+                        className="delete-review-btn"
+                      >
+                      <Trash2 size={15} /> Sil
+                      </button>
+                    )}
                   </div>
                 </div>
               );

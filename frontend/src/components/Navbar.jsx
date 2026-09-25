@@ -365,7 +365,7 @@ const { user, logout } = useAuth();
         </li>
         <li className="divider"></li>
         <li>
-          <Link to="/profile" className="dropdown-link" onClick={closeAll}>
+          <Link to={`/profile/${user.id}`} className="dropdown-link" onClick={closeAll}>
             <User size={15} /> {lang === 'TR' ? 'Profil Sayfam' : 'My Profile'}
           </Link>
         </li>

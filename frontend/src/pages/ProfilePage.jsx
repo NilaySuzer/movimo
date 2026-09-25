@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useParams } from 'react-router-dom';
 import { 
   User, 
   Settings, 
@@ -29,6 +29,8 @@ import '../styles/profile.css';
 import { useToast } from '../context/ToastContext';
 
 export default function ProfilePage() {
+  const { userId } = useParams();
+  const { user: authUser } = useAuth(); 
   const [activeTab, setActiveTab] = useState('reviews'); // 'reviews' | 'watchlist' | 'likes'
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -40,9 +42,11 @@ export default function ProfilePage() {
   const [dbUserReviews, setDbUserReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Oturum açan gerçek kullanıcı
-  const { user } = useAuth(); 
+ const profileUser = userId 
+    ? (communityUsers.find(u => u.id.toString() === userId.toString()) || authUser) 
+    : authUser;
 
+  const user = profileUser;
   const { 
     customLists = [], 
     createCustomList, 
