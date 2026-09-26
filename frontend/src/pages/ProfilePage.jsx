@@ -152,7 +152,7 @@ export default function ProfilePage() {
       u.username.toLowerCase().includes(userSearchQuery.toLowerCase());
   });
 
-  const suggestedUsers = communityUsers.filter((u) => !followingList.includes(u.username)).slice(0, 3);
+  const suggestedUsers = communityUsers.filter((u) => !followingList.map(String).includes(u.id.toString())).slice(0, 3);
 
   return (
     <div className="profile-container">
@@ -223,7 +223,7 @@ export default function ProfilePage() {
                 <span className="stat-lbl">Likes</span>
               </div>
               <div className="stat-box clickable-stat" onClick={() => openFollowModal('followers')}>
-                <span className="stat-val">0</span>
+                <span className="stat-val">{followingList ? followingList.length : 0}</span>
                 <span className="stat-lbl">Followers</span>
               </div>
               <div className="stat-box clickable-stat" onClick={() => openFollowModal('following')}>
@@ -256,7 +256,7 @@ export default function ProfilePage() {
 
             <div className="discovery-users-grid">
               {(userSearchQuery ? filteredUsers : suggestedUsers).map((u) => {
-                const isFollowed = followingList.includes(u.username);
+                const isFollowed = followingList.map(String).includes(u.id.toString());
                 return (
                   <div key={u.id} className="suggested-user-card glass-panel">
                     <img src={u.avatar} alt={u.name} className="sugg-avatar" />
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                     <button 
                       type="button" 
                       className={`sugg-follow-btn ${isFollowed ? 'following' : ''}`}
-                      onClick={() => toggleFollow(u.username)}
+                      onClick={() => toggleFollow(u.id)}
                     >
                       {isFollowed ? <UserCheck size={14} /> : <UserPlus size={14} />}
                       <span>{isFollowed ? 'Takiptesin' : 'Takip Et'}</span>

@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useToast } from '../context/ToastContext';
 
 const MovieContext = createContext();
 
 export function MovieProvider({ children }) {
   const [movies, setMovies] = useState([]);
+  const { showToast } = useToast();
   const [loadingMovies, setLoadingMovies] = useState(true);
-
+const [followingList, setFollowingList] = useState([]);
   const fetchMovies = () => {
     fetch('http://localhost:5080/api/movies')
       .then((res) => (res.ok ? res.json() : []))
@@ -197,6 +199,45 @@ export function MovieProvider({ children }) {
     }
   };
 
+  const toggleFollow = async (targetUserId) => {
+  console.log("Gönderilen user objesi:", user);
+console.log("Gönderilen ID'ler - Follower:", user?.id || user?.Id, "Target:", targetUserId);
+  if (!user) { // Veya currentUser, oturum açan kullanıcı objen neyse
+    showToast('Lütfen önce giriş yapın.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:5080/api/follow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        followerId: user.id,     // Giriş yapan senin ID'n
+        followingId: targetUserId // Takip etmek istediğin kişinin ID'si
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      
+      // Eğer takip ediyorsan listeye ekle, takipten çıktıysan listeden çıkar
+      setFollowingList(prev => 
+        data.isFollowing 
+          ? [...prev, targetUserId] 
+          : prev.filter(id => id !== targetUserId)
+      );
+
+      showToast(data.message, 'success');
+    } else {
+      showToast('Takip işlemi başarısız.', 'error');
+    }
+  } catch (err) {
+    console.error("Takip isteği hatası:", err);
+    showToast('Sunucuya ulaşılamadı.', 'error');
+  }
+};
+
+
   const createCustomList = (title, description = '', selectedIds = []) => {
     if (!title.trim() || !user) return;
     const newList = {
@@ -260,7 +301,7 @@ export function MovieProvider({ children }) {
 
   const [lang, setLang] = useState('TR');
   const [cinemaMode, setCinemaMode] = useState(false);
-  const [followingList, setFollowingList] = useState([]);
+
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -285,9 +326,10 @@ export function MovieProvider({ children }) {
         movies,
         loadingMovies,
         fetchMovies,
+        followingList,
+        toggleFollow,
         currentUser: user, // 👈 Eski uyumluluk için currentUser alias olarak user'ı döndürüyoruz
         updateProfile,
-        followingList,
         customLists,
         createCustomList,
         deleteCustomList,

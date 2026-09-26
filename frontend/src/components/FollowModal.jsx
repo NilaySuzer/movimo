@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import { X, Users, UserCheck, UserPlus } from 'lucide-react';
 import { communityUsers } from '../data/usersData';
 import { useMovies } from '../context/MovieContext';
+import { Link } from 'react-router-dom';
 import '../styles/followModal.css';
 
 export default function FollowModal({ isOpen, onClose, initialTab = 'followers' }) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const { followingList, toggleFollow } = useMovies();
-
   if (!isOpen) return null;
 
   // Takipçiler listesi (Örnek topluluk kullanıcıları)
   const followersList = communityUsers;
 
   // Takip edilenler listesi (Context'teki followingList'e göre filtrelenir)
-  const followingUsers = communityUsers.filter(u => followingList.includes(u.username));
+  const followingUsers = communityUsers.filter(u => 
+    followingList.map(String).includes(u.id.toString())
+  );
 
   const currentList = activeTab === 'followers' ? followersList : followingUsers;
 
@@ -54,36 +56,42 @@ export default function FollowModal({ isOpen, onClose, initialTab = 'followers' 
         <div className="follow-user-list">
           {currentList.length > 0 ? (
             currentList.map((user) => {
-              const isUserFollowed = followingList.includes(user.username);
+              const isUserFollowed = followingList.map(String).includes(user.id.toString());
 
               return (
                 <div key={user.id} className="follow-user-row">
-                  <img src={user.avatar} alt={user.name} className="follow-avatar" />
-                  
-                  <div className="follow-user-info">
-                    <strong className="follow-name">{user.name}</strong>
-                    <span className="follow-handle">{user.username}</span>
-                    <p className="follow-bio">{user.bio}</p>
-                  </div>
+  
+  {/* 1. Çocuk: Avatar ve Bilgiler (Tıklanabilir Link) */}
+  <Link to={`/profile/${user.id}`} className="follow-user-info-link" onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'inherit', flex: 1 }}>
+    <img src={user.avatar} alt={user.name} className="follow-avatar" />
+    
+    <div className="follow-user-info">
+      <strong className="follow-name">{user.name}</strong>
+      <span className="follow-handle">{user.username}</span>
+      <p className="follow-bio">{user.bio}</p>
+    </div>
+  </Link>
 
-                  <button
-                    type="button"
-                    className={`follow-action-btn ${isUserFollowed ? 'following' : 'not-following'}`}
-                    onClick={() => toggleFollow(user.username)}
-                  >
-                    {isUserFollowed ? (
-                      <>
-                        <UserCheck size={15} />
-                        <span>Takiptesin</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus size={15} />
-                        <span>Takip Et</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+  {/* 2. Çocuk: Takip Et / Takiptesin Butonu */}
+  <button
+    type="button"
+    className={`follow-action-btn ${isUserFollowed ? 'following' : 'not-following'}`}
+    onClick={() => toggleFollow(user.id)}
+  >
+    {isUserFollowed ? (
+      <>
+        <UserCheck size={15} />
+        <span>Takiptesin</span>
+      </>
+    ) : (
+      <>
+        <UserPlus size={15} />
+        <span>Takip Et</span>
+      </>
+    )}
+  </button>
+
+</div>
               );
             })
           ) : (

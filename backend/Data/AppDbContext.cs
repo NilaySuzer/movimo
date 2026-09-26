@@ -15,6 +15,8 @@ public class AppDbContext : DbContext
 
     public DbSet<MovieCast> MovieCasts { get; set; }
     public DbSet<User> Users { get; set; }
+
+    public DbSet<Follow> Follows { get; set; }
     public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
     public DbSet<MovieTrivia> MovieTrivias => Set<MovieTrivia>();
     public DbSet<UserInteraction> UserInteractions => Set<UserInteraction>();
